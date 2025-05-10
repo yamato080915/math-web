@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+{% block title %}Math{% endblock %}
+{% block content %}
+<div class="container mt-5">
+	<div class="container mb-4">
+		<form action="" method="post" novalidate="novalidate">
+			<label for="latex" class="form-label">input LaTeX</label>
+			<input type="text" name="latex" id="latex" class="form-control" value="\lim_{x \to a} f(x) = L \quad \text{if} \quad \forall \varepsilon > 0,\ \exists \delta > 0 \ \text{such that} \ 0 < |x - a| < \delta \Rightarrow |f(x) - L| < \varepsilon">
+		</form>
+	</div>
+	<div class="container mb-4">
+		<label class="form-label">output LaTeX</label>
+		<div class="container" id="output">
+			\[
+			\lim_{x \to a} f(x) = L \quad \text{if} \quad \forall \varepsilon > 0,\ \exists \delta > 0 \ \text{such that} \ 0 < |x - a| < \delta \Rightarrow |f(x) - L| < \varepsilon
+			\]
+		</div>
+	</div>
+</div>
+<script>
+	const input = document.getElementById("latex");
+	const output = document.getElementById("output")
+	input.addEventListener("input", () => {
+		const latexCode = input.value;
+		output.innerHTML = `\\[${latexCode}\\]`;
+		MathJax.typesetClear();
+		MathJax.typesetPromise();
+	});
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+{% endblock %}
