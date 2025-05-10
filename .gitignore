@@ -1,3 +1,5 @@
 Pipfile
 Pipfile.lock
 .env
+.htaccess
+index.cgi
