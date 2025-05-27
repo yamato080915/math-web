@@ -18,22 +18,29 @@
 			</button>
 			<div class="collapse navbar-collapse" id="navbarNavAltMarkup">
 				<div class="navbar-nav me-auto">
-					<!--
-					<a href="#" class="nav-link">TEST</a>
-					<a href="#" class="nav-link">TEST</a>-->
+					<a href="{{ url_for('math.latex').replace('index.cgi/', '') }}" class="nav-link">LaTeX</a>
+					<a href="{{ url_for('math.problems').replace('index.cgi/', '') }}" class="nav-link">Problems</a>
 				</div>
-				<!--
 				<div class="navbar-nav">
 					<div class="nav-item dropdown">
-						<a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">sites
+						<a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+							{% if current_user.is_authenticated %}
+								{{ current_user.email.split('@')[0] }}
+							{% else %}
+								Account
+							{% endif %}
 						</a>
 						<ul class="dropdown-menu dropdown-menu-dark">
-								<li><a href="" class="dropdown-item">steam</a></li>
-								<li><a href="" class="dropdown-item">Account Settings</a></li>
-								<li><a href="" class="dropdown-item">Logout</a></li>
+							{% if current_user.is_authenticated %}
+								<li><a href="{{ url_for('account.account').replace('index.cgi/', '') }}" class="dropdown-item">Account Settings</a></li>
+								<li><a href="{{ url_for('account.logout').replace('index.cgi/', '') }}" class="dropdown-item">Logout</a></li>
+							{% else %}
+								<li><a href="{{ url_for('account.login').replace('index.cgi/', '') }}" class="dropdown-item">Login</a></li>
+								<li><a href="{{ url_for('account.register').replace('index.cgi/', '') }}" class="dropdown-item">Sign Up</a></li>
+							{% endif %}
 						</ul>
 					</div>
-				</div>-->
+				</div>
 			</div>
 		</div>
 	</nav>
