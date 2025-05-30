@@ -2,6 +2,10 @@
 {% block title %}Math Problems{% endblock %}
 {% block content %}
 <div class="container mt-5">
-	{{ data["content"] }}
+	<div class="card">
+		<div class="card-body">
+			{{ data["content"] | replace("\r\n", "<br>") | safe }}
+		</div>
+	</div>
 </div>
 {% endblock %}

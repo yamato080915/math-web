@@ -523,12 +523,17 @@ x &=& 1<br>
 <script>//LaTeX
 	const input = document.getElementById("content");
 	const output = document.getElementById("preview")
+	let debounceTimer;
+	const debounceDelay = 1000;
 	input.addEventListener("input", () => {
-		const latexCode = input.value;
-		const formatted = latexCode.replace(/\n/g, "<br>");
-		output.innerHTML = `${formatted}`;
-		MathJax.typesetClear();
-		MathJax.typesetPromise();
+		clearTimeout(debounceTimer);
+		debounceTimer = setTimeout(() => {
+			const latexCode = input.value;
+			const formatted = latexCode.replace(/\n/g, "<br>");
+			output.innerHTML = `${formatted}`;
+			MathJax.typesetClear();
+			MathJax.typesetPromise();
+		}, debounceDelay);
 	});
 
 	const unitMap = {
