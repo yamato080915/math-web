@@ -29,7 +29,6 @@
 				<div class="mb-3">
 					<label for="category" class="form-label">カテゴリ</label>
 					<select name="category" id="category" class="form-select" required>
-						<option disabled selected value="">選択してください</option>
 						<option>数学Ⅰ</option>
 						<option>数学Ａ</option>
 						<option>数学Ⅱ</option>
@@ -41,7 +40,6 @@
 				<div class="mb-3">
 					<label for="unit" class="form-label">単元</label>
 					<select name="unit" id="unit" class="form-select" required>
-						<option disabled selected value="">カテゴリを選択してください</option>
 					</select>
 				</div><!--UNIT-->
 				<div class="d-grid">
@@ -105,6 +103,17 @@
 			unitSelect.appendChild(option);
 		});
 	});
+	categorySelect.value = "{{ data['category'] }}";
+	const units = unitMap["{{ data['category'] }}"] || [];
+	units.forEach(unit => {
+			const option = document.createElement("option");
+			option.value = unit;
+			option.textContent = unit;
+			unitSelect.appendChild(option);
+	})
+
+	unitSelect.value = "{{ data['unit'] }}";
+
 	latexevent(content, preview);
 	latexevent(explanation, preview2);
 </script>

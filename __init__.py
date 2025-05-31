@@ -44,12 +44,18 @@ def problem(id):
 @math.route("/problems/problem/<id>/edit", methods=["GET", "POST"])
 @login_required
 def edit(id):
+	p = db.session.query(MathProblems).get(id)
 	if request.method=="GET":
-		p = db.session.query(MathProblems).get(id)
 		if current_user.id == int(p.user):
 			p = {"id":p.id, "userid":int(p.user), "user":User.query.get(p.user).email.split("@")[0], "title":p.title, "content":p.content, "explanation":p.explanation, "category":p.category, "unit":p.unit, "created_at":p.created_at}
 			return render_template("math/problems/edit.html", data=p)
 		else:
 			return "403"
 	elif request.method=="POST":
+		if p.title!=request.form["title"]:p.title = request.form["title"]
+		if p.content!=request.form["content"]:p.content = request.form["content"]
+		if p.explanation!=request.form["explanation"]:p.explanation = request.form["explanation"]
+		if p.category!=request.form["category"]:p.category = request.form["category"]
+		if p.unit!=request.form["unit"]:p.unit = request.form["unit"]
+		db.session.commit()
 		return redirect(url_for("math.problem", id=id))
