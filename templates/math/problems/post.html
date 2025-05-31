@@ -532,7 +532,7 @@ x &=& 1<br>
 			const formatted = latexCode.replace(/\n/g, "<br>");
 			output.innerHTML = `${formatted}`;
 			MathJax.typesetClear();
-			MathJax.typesetPromise();
+			MathJax.typesetPromise([output]);
 		}, debounceDelay);
 	});
 
@@ -560,6 +560,7 @@ x &=& 1<br>
 			unitSelect.appendChild(option);
 		});
 	});
+	
 	const latexCode = input.value;
 	const formatted = latexCode.replace(/\n/g, "<br>");
 	output.innerHTML = `${formatted}`;
