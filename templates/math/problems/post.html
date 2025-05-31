@@ -7,14 +7,29 @@
 			<h1 class="card-title h3 mb-4">投稿</h1>
 			<form method="post">
 				<div class="mb-3">
+					<label for="title" class="form-label">タイトル</label>
+					<input type="text" name="title" id="title" class="form-control" required>
+				</div><!--TITLE-->
+				<div class="mb-3">
 					<label for="content" class="form-label">問題文(LaTeX対応)</label>
-					<textarea name="content" id="content" class="form-control" rows="6" required>
-\(\text{sample}\)
+					<textarea name="content" id="content" class="form-control" rows="6" required placeholder="\(\text{sample}\)
 2次方程式\(\ ax^2+bx+c=0\ \)の解は\[\ x=\frac{-b\pm\sqrt{b^2-4ac}}{2a} \ \]である。
 \[
 \int_{-\infty}^{\infty} e^{-x^2} \, dx = \sqrt{\pi}
-\]</textarea>
-				</div>
+\]"></textarea>
+				</div><!--CONTENT-->
+				<div class="mb-3">
+					<label for="preview" class="form-label">問題文プレビュー</label>
+					<div id="preview" class="border rounded bg-white p-3" style="min-height: 120px;"></div>
+				</div><!--PREVIEW-->
+				<div class="mb-3">
+					<label for="explanation" class="form-label">解答解説(任意)</label>
+					<textarea name="explanation" id="explanation" class="form-control" rows="6"></textarea>
+				</div><!--EXPLANATION-->
+				<div class="mb-3">
+					<label for="preview2" class="form-label">解答解説プレビュー</label>
+					<div id="preview2" class="border rounded bg-white p-3" style="min-height: 120px;"></div>
+				</div><!--PREVIEW2-->
 				<div class="mb-3">
 					<label for="category" class="form-label">カテゴリ</label>
 					<select name="category" id="category" class="form-select" required>
@@ -26,17 +41,13 @@
 						<option>数学Ⅲ</option>
 						<option>数学Ｃ</option>
 					</select>
-				</div>
+				</div><!--CATEGORY-->
 				<div class="mb-3">
 					<label for="unit" class="form-label">単元</label>
 					<select name="unit" id="unit" class="form-select" required>
 						<option disabled selected value="">カテゴリを選択してください</option>
 					</select>
-				</div>
-				<div class="mb-3">
-					<label for="preview" class="form-label">プレビュー</label>
-					<div id="preview" class="border rounded bg-white p-3" style="min-height: 120px;"></div>
-				</div>
+				</div><!--UNIT-->
 				<div class="d-grid">
 					<button type="submit" class="btn btn-primary mb-5">投稿</button>
 				</div>
@@ -521,18 +532,32 @@ x &=& 1<br>
 	</div>
 </div>
 <script>//LaTeX
-	const input = document.getElementById("content");
-	const output = document.getElementById("preview")
+	function latexevent(input, output) {
+		const latexCode = input.value;
+		const formatted = latexCode.replace(/\n/g, "<br>");
+		output.innerHTML = `${formatted}`;
+		MathJax.typesetClear();
+		MathJax.typesetPromise([output]);
+	}
+
+	const content = document.getElementById("content");
+	const preview = document.getElementById("preview");
 	let debounceTimer;
 	const debounceDelay = 1000;
-	input.addEventListener("input", () => {
+	content.addEventListener("input", () => {
 		clearTimeout(debounceTimer);
 		debounceTimer = setTimeout(() => {
-			const latexCode = input.value;
-			const formatted = latexCode.replace(/\n/g, "<br>");
-			output.innerHTML = `${formatted}`;
-			MathJax.typesetClear();
-			MathJax.typesetPromise([output]);
+			latexevent(content, preview);
+		}, debounceDelay);
+	});
+
+	const explanation = document.getElementById("explanation");
+	const preview2 = document.getElementById("preview2")
+	let debounceTimer2;
+	explanation.addEventListener("input", () => {
+		clearTimeout(debounceTimer2);
+		debounceTimer2 = setTimeout(() => {
+			latexevent(explanation, preview2);
 		}, debounceDelay);
 	});
 
@@ -561,9 +586,9 @@ x &=& 1<br>
 		});
 	});
 	
-	const latexCode = input.value;
+	const latexCode = "\\(\\text{sample}\\)\n2次方程式\\(\\ ax^2+bx+c=0\\ \\)の解は\\[\\ x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a} \\ \\]である。\\[\\int_{-\\infty}^{\\infty} e^{-x^2} \\, dx = \\sqrt{\\pi}\\]";
 	const formatted = latexCode.replace(/\n/g, "<br>");
-	output.innerHTML = `${formatted}`;
+	preview.innerHTML = `${formatted}`;
 	MathJax.typesetClear();
 	MathJax.typesetPromise();
 
