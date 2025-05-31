@@ -1,0 +1,111 @@
+{% extends "math/layout.html" %}
+{% block title %}post{% endblock %}
+{% block content %}
+<div class="container my-5">
+	<div class="card shadow">
+		<div class="card-body">
+			<h1 class="card-title h3 mb-4">編集</h1>
+			<form method="post">
+				<div class="mb-3">
+					<label for="title" class="form-label">タイトル</label>
+					<input type="text" name="title" id="title" class="form-control" required value="{{ data['title'] }}">
+				</div><!--TITLE-->
+				<div class="mb-3">
+					<label for="content" class="form-label">問題文(LaTeX対応)</label>
+					<textarea name="content" id="content" class="form-control" rows="6" required">{{ data['content'] }}</textarea>
+				</div><!--CONTENT-->
+				<div class="mb-3">
+					<label for="preview" class="form-label">問題文プレビュー</label>
+					<div id="preview" class="border rounded bg-white p-3" style="min-height: 120px;"></div>
+				</div><!--PREVIEW-->
+				<div class="mb-3">
+					<label for="explanation" class="form-label">解答解説(任意)</label>
+					<textarea name="explanation" id="explanation" class="form-control" rows="6">{{ data['explanation'] }}</textarea>
+				</div><!--EXPLANATION-->
+				<div class="mb-3">
+					<label for="preview2" class="form-label">解答解説プレビュー</label>
+					<div id="preview2" class="border rounded bg-white p-3" style="min-height: 120px;"></div>
+				</div><!--PREVIEW2-->
+				<div class="mb-3">
+					<label for="category" class="form-label">カテゴリ</label>
+					<select name="category" id="category" class="form-select" required>
+						<option disabled selected value="">選択してください</option>
+						<option>数学Ⅰ</option>
+						<option>数学Ａ</option>
+						<option>数学Ⅱ</option>
+						<option>数学Ｂ</option>
+						<option>数学Ⅲ</option>
+						<option>数学Ｃ</option>
+					</select>
+				</div><!--CATEGORY-->
+				<div class="mb-3">
+					<label for="unit" class="form-label">単元</label>
+					<select name="unit" id="unit" class="form-select" required>
+						<option disabled selected value="">カテゴリを選択してください</option>
+					</select>
+				</div><!--UNIT-->
+				<div class="d-grid">
+					<button type="submit" class="btn btn-primary mb-5">投稿</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+<script>//LaTeX
+	function latexevent(input, output) {
+		const latexCode = input.value;
+		const formatted = latexCode.replace(/\n/g, "<br>");
+		output.innerHTML = `${formatted}`;
+		MathJax.typesetClear();
+		MathJax.typesetPromise([output]);
+	}
+
+	const content = document.getElementById("content");
+	const preview = document.getElementById("preview");
+	let debounceTimer;
+	const debounceDelay = 1000;
+	content.addEventListener("input", () => {
+		clearTimeout(debounceTimer);
+		debounceTimer = setTimeout(() => {
+			latexevent(content, preview);
+		}, debounceDelay);
+	});
+
+	const explanation = document.getElementById("explanation");
+	const preview2 = document.getElementById("preview2")
+	let debounceTimer2;
+	explanation.addEventListener("input", () => {
+		clearTimeout(debounceTimer2);
+		debounceTimer2 = setTimeout(() => {
+			latexevent(explanation, preview2);
+		}, debounceDelay);
+	});
+
+	const unitMap = {
+		"数学Ⅰ": ["数と式", "2次関数", "集合と命題", "図形と計量", "データの分析"],
+		"数学Ａ": ["場合の数", "確率", "図形の性質", "整数"],
+		"数学Ⅱ": ["式と計算", "高次方程式", "図形と方程式", "三角関数", "指数関数と対数関数", "微分法", "積分法"],
+		"数学Ｂ": ["数列", "確率分布と統計的な推測"],
+		"数学Ⅲ": ["極限", "微分法", "積分法"],
+		"数学Ｃ": ["平面ベクトル", "空間ベクトル", "複素数平面", "式と曲線"]
+	};
+
+	const categorySelect = document.getElementById("category");
+	const unitSelect = document.getElementById("unit");
+
+	categorySelect.addEventListener("change", () => {
+		const selectedCategory = categorySelect.value;
+		const units = unitMap[selectedCategory] || [];
+
+		unitSelect.innerHTML = '<option disabled selected value="">単元を選択してください</option>';
+		units.forEach(unit => {
+			const option = document.createElement("option");
+			option.value = unit;
+			option.textContent = unit;
+			unitSelect.appendChild(option);
+		});
+	});
+	latexevent(content, preview);
+	latexevent(explanation, preview2);
+</script>
+{% endblock %}
