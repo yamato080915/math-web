@@ -33,7 +33,6 @@ def post():
 		return redirect(url_for("math.problem", id=p.id))
 
 @math.route("/problems/problem/<id>", methods=["GET", "POST"])
-@login_required
 def problem(id):
 	p = db.session.query(MathProblems).get(id)
 	if p==None:
