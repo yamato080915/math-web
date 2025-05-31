@@ -39,7 +39,7 @@ def problem(id):
 	if p==None:
 		return "404"
 	else:
-		p = {"id":p.id, "userid":int(p.user), "user":User.query.get(p.user).email.split("@")[0], "content":p.content, "category":p.category, "unit":p.unit, "created_at":p.created_at}
+		p = {"id":p.id, "userid":int(p.user), "user":User.query.get(p.user).email.split("@")[0], "title":request.form["title"], "content":p.content, "explanation":request.form["explanation"], "category":p.category, "unit":p.unit, "created_at":p.created_at}
 		return render_template("math/problems/problem.html", data=p)
 
 @math.route("/problems/problem/<id>/edit", methods=["GET", "POST"])
@@ -47,6 +47,6 @@ def problem(id):
 def edit(id):
 	p = db.session.query(MathProblems).get(id)
 	if current_user.id == int(p.user):
-		return jsonify({"id":p.id, "userid":int(p.user), "user":User.query.get(p.user).email.split("@")[0], "content":p.content, "category":p.category, "unit":p.unit, "created_at":p.created_at})
+		return jsonify({"id":p.id, "userid":int(p.user), "user":User.query.get(p.user).email.split("@")[0], "title":request.form["title"], "content":p.content, "explanation":request.form["explanation"], "category":p.category, "unit":p.unit, "created_at":p.created_at})
 	else:
 		return "403"
