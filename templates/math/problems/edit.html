@@ -16,7 +16,9 @@
 				</div><!--CONTENT-->
 				<div class="mb-3">
 					<label for="preview" class="form-label">問題文プレビュー</label>
-					<div id="preview" class="border rounded bg-white p-3" style="min-height: 120px;"></div>
+					<div class="mx-5">
+						<div id="preview" class="border rounded bg-white p-3 mx-5" style="min-height: 120px;"></div>
+					</div>
 				</div><!--PREVIEW-->
 				<div class="mb-3">
 					<label for="explanation" class="form-label">解答解説(任意)</label>
@@ -24,7 +26,9 @@
 				</div><!--EXPLANATION-->
 				<div class="mb-3">
 					<label for="preview2" class="form-label">解答解説プレビュー</label>
-					<div id="preview2" class="border rounded bg-white p-3" style="min-height: 120px;"></div>
+					<div class="mx-5">
+						<div id="preview2" class="border rounded bg-white p-3 mx-5" style="min-height: 120px;"></div>
+					</div>
 				</div><!--PREVIEW2-->
 				<div class="mb-3">
 					<label for="category" class="form-label">カテゴリ</label>
@@ -70,7 +74,7 @@
 	});
 
 	const explanation = document.getElementById("explanation");
-	const preview2 = document.getElementById("preview2")
+	const preview2 = document.getElementById("preview2");
 	let debounceTimer2;
 	explanation.addEventListener("input", () => {
 		clearTimeout(debounceTimer2);
