@@ -11,25 +11,25 @@
 					<input type="text" name="title" id="title" class="form-control" required value="{{ data['title'] }}">
 				</div><!--TITLE-->
 				<div class="mb-3">
-					<label for="content" class="form-label">問題文(LaTeX対応)</label>
-					<textarea name="content" id="content" class="form-control" rows="6" required">{{ data['content'] }}</textarea>
-				</div><!--CONTENT-->
-				<div class="mb-3">
 					<label for="preview" class="form-label">問題文プレビュー</label>
 					<div class="mx-5">
 						<div id="preview" class="border rounded bg-white p-3 mx-5" style="min-height: 120px;"></div>
 					</div>
 				</div><!--PREVIEW-->
 				<div class="mb-3">
-					<label for="explanation" class="form-label">解答解説(任意)</label>
-					<textarea name="explanation" id="explanation" class="form-control" rows="6">{{ data['explanation'] }}</textarea>
-				</div><!--EXPLANATION-->
+					<label for="content" class="form-label">問題文(LaTeX対応)</label>
+					<textarea name="content" id="content" class="form-control" rows="6" required">{{ data['content'] }}</textarea>
+				</div><!--CONTENT-->
 				<div class="mb-3">
 					<label for="preview2" class="form-label">解答解説プレビュー</label>
 					<div class="mx-5">
 						<div id="preview2" class="border rounded bg-white p-3 mx-5" style="min-height: 120px;"></div>
 					</div>
 				</div><!--PREVIEW2-->
+				<div class="mb-3">
+					<label for="explanation" class="form-label">解答解説(任意)</label>
+					<textarea name="explanation" id="explanation" class="form-control" rows="6">{{ data['explanation'] }}</textarea>
+				</div><!--EXPLANATION-->
 				<div class="mb-3">
 					<label for="category" class="form-label">カテゴリ</label>
 					<select name="category" id="category" class="form-select" required>

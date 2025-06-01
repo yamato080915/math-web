@@ -50,7 +50,7 @@ def edit(id):
 			p = {"id":p.id, "userid":int(p.user), "user":User.query.get(p.user).email.split("@")[0], "title":p.title, "content":p.content, "explanation":p.explanation, "category":p.category, "unit":p.unit, "created_at":p.created_at}
 			return render_template("math/problems/edit.html", data=p)
 		else:
-			return "403"
+			return url_for("forbidden")
 	elif request.method=="POST":
 		if p.title!=request.form["title"]:p.title = request.form["title"]
 		if p.content!=request.form["content"]:p.content = request.form["content"]
