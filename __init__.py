@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify, abort
 from flask_login import login_required, current_user
 
 from models import User, MathProblems
@@ -50,7 +50,7 @@ def edit(id):
 			p = {"id":p.id, "userid":int(p.user), "user":User.query.get(p.user).email.split("@")[0], "title":p.title, "content":p.content, "explanation":p.explanation, "category":p.category, "unit":p.unit, "created_at":p.created_at}
 			return render_template("math/problems/edit.html", data=p)
 		else:
-			return url_for("forbidden")
+			return abort(403)
 	elif request.method=="POST":
 		if p.title!=request.form["title"]:p.title = request.form["title"]
 		if p.content!=request.form["content"]:p.content = request.form["content"]

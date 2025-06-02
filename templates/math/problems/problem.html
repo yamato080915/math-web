@@ -8,7 +8,7 @@
 				<h2 class="card-title">{{ data["title"] }}</h2>
 				<div class="row">
 					<div class="col">
-						<p>作成者：{{ data["user"] }}<br>
+						<p>作成者：{{ data["user"] }}{% if data["userid"]==1 %}:admin{% endif %}<br>
 						単元：{{ data["category"] }}・{{ data["unit"] }}</p>
 					</div>
 					<div class="col text-end">
