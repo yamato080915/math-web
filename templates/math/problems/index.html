@@ -3,5 +3,60 @@
 {% block content %}
 <div class="container mt-5">
 	<h1>Problems</h1>
+	<div class="container my-3">
+		<h4>単元から選択</h4>
+		<div class="accordion" id="categoryAccordion">
+			{% set math = {
+				"数学Ⅰ": ["数と式", "2次関数", "集合と命題", "図形と計量", "データの分析"],
+				"数学Ａ": ["場合の数", "確率", "図形の性質", "整数"],
+				"数学Ⅱ": ["式と計算", "高次方程式", "図形と方程式", "三角関数", "指数関数と対数関数", "微分法", "積分法"],
+				"数学Ｂ": ["数列", "確率分布と統計的な推測"],
+				"数学Ⅲ": ["極限", "微分法", "積分法"],
+				"数学Ｃ": ["平面ベクトル", "空間ベクトル", "複素数平面", "式と曲線"]
+			} %}
+			{% for i in math %}
+				<div class="accordion-item">
+					<h2 class="accordion-header" id="{{ i }}">
+						<button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#{{ i }}units" aria-expanded="false" aria-controls="{{ i }}units">
+							{{ i }}
+						</button>
+					</h2>
+					<div class="accordion-collapse collapse" id="{{ i }}units" aria-labelledby="{{ i }}">
+						<ul class="list-group">
+							<li class="list-group-item">
+								<input type="checkbox" name="All{{i}}" id="All{{i}}" class="form-check-input me-1">
+								<label for="All{{i}}" class="form-check-label">すべて選択</label>
+							</li>
+							{% for j in math[i] %}
+								<li class="list-group-item">
+									<input type="checkbox" name="All{{i}}{{j}}" id="All{{i}}{{j}}" class="form-check-input me-1">
+									<label for="All{{i}}{{j}}" class="form-check-label">{{j}}</label>
+								</li>
+							{% endfor %}
+						</ul>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+	</div>
+	<div class="container my-3">
+		<h4>AIのおすすめ(案)</h4>
+	</div>
+	<div class="container my-3">
+		<h4>新規</h4>
+	</div>
+	<div class="container my-3">
+		<h4>自分の問題</h4>
+		<div class="list-group">
+			{% for i in data["my-problem"] %}
+				<a href="{{ url_for('math.problem', id=i.id) }}" class="list-group-item list-group-item-action">
+					<div class="row">
+						<div class="col">{{ i.title }}</div>
+						<div class="col">{{ i.category }}・{{ i.unit }}</div>
+					</div>
+				</a>
+			{% endfor %}
+		</div>
+	</div>
 </div>
 {% endblock %}

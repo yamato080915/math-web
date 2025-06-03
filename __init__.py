@@ -17,7 +17,10 @@ def latex():
 
 @math.route("/problems", methods=["GET", "POST"])
 def problems():
-	return render_template("math/problems/index.html")
+	data = {
+		"my-problem": db.session.query(MathProblems).filter_by(user=int(current_user.get_id())).all()
+	}
+	return render_template("math/problems/index.html", data=data)
 
 @math.route("/problems/post", methods=["GET", "POST"])
 @login_required
