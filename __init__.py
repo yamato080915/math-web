@@ -4,6 +4,8 @@ from flask_login import login_required, current_user
 from models import User, MathProblems
 from app import db
 
+from random import randint
+
 math = Blueprint(
 	"math", 
 	__name__, 
@@ -18,9 +20,15 @@ def latex():
 @math.route("/problems", methods=["GET", "POST"])
 def problems():
 	data = {
-		"my-problem": db.session.query(MathProblems).filter_by(user=int(current_user.get_id())).all()
+		"my-problem": db.session.query(MathProblems).filter_by(user=int(current_user.get_id())).all(),
+		"new": [x for x in db.session.query(MathProblems).all() if int(x.user)!=int(current_user.get_id())][-5:],
+		"random": db.session.query(MathProblems).get(randint(1, db.session.query(MathProblems).count()))
 	}
 	return render_template("math/problems/index.html", data=data)
+
+@math.route("/problems/all", methods=["GET", "POST"])
+def problemsAll():
+	return render_template("math/problems/all.html", data=db.session.query(MathProblems).all())
 
 @math.route("/problems/post", methods=["GET", "POST"])
 @login_required
