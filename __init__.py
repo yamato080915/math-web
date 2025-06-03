@@ -30,7 +30,7 @@ def post():
 			db.session.add(problem)
 			db.session.commit()
 		p = db.session.query(MathProblems).filter_by(user=int(current_user.get_id()), title=request.form["title"], content=request.form["content"], explanation=request.form["explanation"], category=request.form["category"], unit=request.form["unit"]).first()
-		return redirect(url_for("math.problem", id=p.id))
+		return redirect(url_for("math.problem", id=p.id).replace('index.cgi/', ''))
 
 @math.route("/problems/problem/<id>", methods=["GET", "POST"])
 def problem(id):
@@ -58,4 +58,4 @@ def edit(id):
 		if p.category!=request.form["category"]:p.category = request.form["category"]
 		if p.unit!=request.form["unit"]:p.unit = request.form["unit"]
 		db.session.commit()
-		return redirect(url_for("math.problem", id=id))
+		return redirect(url_for("math.problem", id=id).replace('index.cgi/', ''))
