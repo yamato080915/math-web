@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, jsonify, abort
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify, abort, flash
 from flask_login import login_required, current_user
 
 from models import User, MathProblems
@@ -36,11 +36,17 @@ def post():
 	if request.method == "GET":
 		return render_template("math/problems/post.html")
 	else:
+		try:
+			score = list(map(int, request.form["score"].split("\r\n")))#例外処理
+		except:
+			flash("error.score")
+			return redirect(url_for("math.post"))
+		score = " ".join([str(x) for x in score])
 		if not db.session.query(MathProblems).filter_by(user=int(current_user.get_id()), content=request.form["content"], category=request.form["category"], unit=request.form["unit"]).first():
-			problem = MathProblems(user=int(current_user.get_id()), title=request.form["title"], content=request.form["content"], explanation=request.form["explanation"], category=request.form["category"], unit=request.form["unit"])
+			problem = MathProblems(user=int(current_user.get_id()), title=request.form["title"], content=request.form["content"], explanation=request.form["explanation"], category=request.form["category"], unit=request.form["unit"], score=score)
 			db.session.add(problem)
 			db.session.commit()
-		p = db.session.query(MathProblems).filter_by(user=int(current_user.get_id()), title=request.form["title"], content=request.form["content"], explanation=request.form["explanation"], category=request.form["category"], unit=request.form["unit"]).first()
+		p = db.session.query(MathProblems).filter_by(user=int(current_user.get_id()), title=request.form["title"], content=request.form["content"], explanation=request.form["explanation"], category=request.form["category"], unit=request.form["unit"], score=score).first()
 		return redirect(url_for("math.problem", id=p.id).replace('index.cgi/', ''))
 
 @math.route("/problems/problem/<id>", methods=["GET", "POST"])
@@ -49,8 +55,13 @@ def problem(id):
 	if p==None:
 		return "404"
 	else:
-		p = {"id":p.id, "userid":int(p.user), "user":User.query.get(p.user).email.split("@")[0], "title":p.title, "content":p.content, "explanation":p.explanation, "category":p.category, "unit":p.unit, "created_at":p.created_at}
-		return render_template("math/problems/problem.html", data=p)
+		score = list(map(int, p.score.split()))
+		if request.method=="GET":
+			p = {"id":p.id, "userid":int(p.user), "user":User.query.get(p.user).email.split("@")[0], "title":p.title, "content":p.content, "explanation":p.explanation, "category":p.category, "unit":p.unit, "score":[score, sum(score), len(score)], "created_at":p.created_at}
+			return render_template("math/problems/problem.html", data=p)
+		else:
+			p = {"id":p.id, "userid":int(p.user), "user":User.query.get(p.user).email.split("@")[0], "title":p.title, "content":p.content, "explanation":p.explanation, "category":p.category, "unit":p.unit, "score":[score, sum(score), len(score)], "created_at":p.created_at}
+			return render_template("math/problems/problem.html", data=p)
 
 @math.route("/problems/problem/<id>/edit", methods=["GET", "POST"])
 @login_required

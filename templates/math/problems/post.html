@@ -1,6 +1,34 @@
 {% extends "math/layout.html" %}
 {% block title %}post{% endblock %}
 {% block content %}
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h1 class="modal-title fs-5" id="errorModalLabel">エラー</h1>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<ul>
+				{% if "error.score" in messages %}
+					<li>配点が有効ではありません</li>
+				{% endif %}
+				</ul>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	const myModal = new bootstrap.Modal(document.getElementById('errorModal'));
+	myModal.show();
+</script>
+{% endif %}
+{% endwith %}
 <div class="container my-5">
 	<div class="card shadow">
 		<div class="card-body">
@@ -13,7 +41,7 @@
 				<div class="mb-3">
 					<label for="content" class="form-label">問題文(LaTeX対応)</label>
 					<textarea name="content" id="content" class="form-control" rows="6" required placeholder="\(\text{sample}\)
-2次方程式\(\ ax^2+bx+c=0\ \)の解は\[\ x=\frac{-b\pm\sqrt{b^2-4ac}}{2a} \ \]である。
+2次方程式\(\ ax^2+bx+c=0\ (a\neq 0)\ \)の解は\[\ x=\frac{-b\pm\sqrt{b^2-4ac}}{2a} \ \]である。
 \[
 \int_{-\infty}^{\infty} e^{-x^2} \, dx = \sqrt{\pi}
 \]"></textarea>
@@ -52,6 +80,13 @@
 						<option disabled selected value="">カテゴリを選択してください</option>
 					</select>
 				</div><!--UNIT-->
+				<div class="mb-3">
+					<label for="score" class="form-label">配点(1問ずつ改行して配点を入力してください。)</label>
+					<textarea name="score" id="score" class="form-control" rows="4" placeholder="5
+5
+10
+10" required></textarea>
+				</div>
 				<div class="d-grid">
 					<button type="submit" class="btn btn-primary mb-5">投稿</button>
 				</div>
@@ -192,18 +227,18 @@ x &=& 1<br>
 							<td>連立方程式</td>
 							<td>\begin{eqnarray}
   \left\{
-    \begin{array}{l}
-      x + y = 10 \\
-      2x + 4y = 32
-    \end{array}
+	\begin{array}{l}
+	  x + y = 10 \\
+	  2x + 4y = 32
+	\end{array}
   \right.
 \end{eqnarray}</td>
 							<td>\\begin{eqnarray}<br>
   \left\{<br>
-    \\begin{array}{l}<br>
-      x + y = 10 \\\\<br>
-      2x + 4y = 32<br>
-    \\end{array}<br>
+	\\begin{array}{l}<br>
+	  x + y = 10 \\\\<br>
+	  2x + 4y = 32<br>
+	\\end{array}<br>
   \right.<br>
 \\end{eqnarray}</td>
 						</tr>
@@ -213,16 +248,16 @@ x &=& 1<br>
 \left|x\right|
  =
   \begin{cases}
-    x & ( x \geqq 0 ) \\
-    -x & ( x \lt 0 )
+	x & ( x \geqq 0 ) \\
+	-x & ( x \lt 0 )
   \end{cases}
 \end{eqnarray}</td>
 							<td>\\begin{eqnarray}<br>
 \left|x\right|<br>
  =<br>
   \\begin{cases}<br>
-    x & ( x \geqq 0 ) \\\\<br>
-    -x & ( x \lt 0 )<br>
+	x & ( x \geqq 0 ) \\\\<br>
+	-x & ( x \lt 0 )<br>
   \\end{cases}<br>
 \end{eqnarray}</td>
 						</tr>
@@ -590,7 +625,7 @@ x &=& 1<br>
 		});
 	});
 	
-	const latexCode = "\\(\\text{sample}\\)\n2次方程式\\(\\ ax^2+bx+c=0\\ \\)の解は\\[\\ x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a} \\ \\]である。\\[\\int_{-\\infty}^{\\infty} e^{-x^2} \\, dx = \\sqrt{\\pi}\\]";
+	const latexCode = "\\(\\text{sample}\\)\n2次方程式\\(\\ ax^2+bx+c=0\\ (a\\neq 0)\\ \\)の解は\\[\\ x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a} \\ \\]である。\\[\\int_{-\\infty}^{\\infty} e^{-x^2} \\, dx = \\sqrt{\\pi}\\]";
 	const formatted = latexCode.replace(/\n/g, "<br>");
 	preview.innerHTML = `${formatted}`;
 	MathJax.typesetClear();

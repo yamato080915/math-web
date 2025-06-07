@@ -4,18 +4,16 @@
 <div class="container mt-5">
 	<div class="card">
 		<div class="card-body">
-			<div>
-				<h2 class="card-title">{{ data["title"] }}</h2>
-				<div class="row">
-					<div class="col">
-						<p>作成者：{{ data["user"] }}{% if data["userid"]==1 %}:admin{% endif %}<br>
-						単元：{{ data["category"] }}・{{ data["unit"] }}</p>
-					</div>
-					<div class="col text-end">
-						{% if current_user.id==data["userid"] %}
-						<a href="{{ url_for('math.edit', id=data['id']).replace('index.cgi/', '') }}" class="btn btn-primary">編集</a>
-						{% endif %}
-					</div>
+			<h2 class="card-title">{{ data["title"] }}</h2>
+			<div class="row">
+				<div class="col">
+					<p>作成者：{{ data["user"] }}{% if data["userid"]==1 %}:admin{% endif %}<br>
+					単元：{{ data["category"] }}・{{ data["unit"] }}</p>
+				</div>
+				<div class="col text-end">
+					{% if current_user.id==data["userid"] %}
+					<a href="{{ url_for('math.edit', id=data['id']).replace('index.cgi/', '') }}" class="btn btn-primary">編集</a>
+					{% endif %}
 				</div>
 			</div>
 			<div class="mx-5 mb-3">
@@ -26,7 +24,89 @@
 					</div>
 				</div>
 			</div>
+			<div class="mx-5 mb-3">
+				<h5>配点</h5>
+				<div class="mx-5 card">
+					<div class="card-body">
+						<ol>
+							{% for i in data["score"][0] %}
+							<li>{{ i }}点</li>
+							{% endfor %}
+						</ol>
+						{% if data["score"][2]!=1 %}
+						合計：{{ data["score"][1] }}
+						{% endif %}
+					</div>
+				</div>
+			</div>
+			{% if current_user.id==data["userid"] %}
+			<div class="accordion mx-5 mb-3" id="explanation-accordion">
+				<div class="accordion-item mx-5">
+					<h2 class="accordion-header">
+						<button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#explanation-accordion-body" aria-expanded="false" aria-controls="explanation-accordion-body">
+							解答解説
+						</button>
+					</h2>
+					<div class="accordion-collapse collapse" id="explanation-accordion-body">
+						<div class="accordion-body">
+							{{ data["explanation"] | replace("\r\n", "<br>") | safe }}
+						</div>
+					</div>
+				</div>
+			</div>
+			{% endif %}
+			<div class="mx-5 mb-3">
+				{% if current_user.id==data["userid"] %}
+				<h5>採点する</h5>
+				{% else %}
+				<h5>回答する</h5>
+				<div class="mx-5 card">
+					<div class="card-body">
+						<form method="post">
+							<div class="mb-3">
+								<label for="answer" class="form-label">答案(記述は任意です。採点者に分かる形で答案を作成してください。)</label>
+								<textarea name="answer" id="answer" class="form-control" rows="6" required placeholder="(答)\(\boxed{\dfrac{1}{2}x^2+x+2}\)"></textarea>
+							</div>
+							<div class="mb-3">
+								<label for="preview" class="form-label">問題文プレビュー</label>
+								<div class="mx-5">
+									<div id="preview" class="border rounded bg-white p-3 mx-5" style="min-height: 120px;"></div>
+								</div>
+							</div>
+							<div class="d-grid">
+								<button type="submit" class="btn btn-primary mb-3">提出</button>
+							</div>
+						</form>
+					</div>
+				</div>
+				{% endif %}
+			</div>
 		</div>
 	</div>
 </div>
+<script>
+	function latexevent(input, output) {
+		const latexCode = input.value;
+		const formatted = latexCode.replace(/\n/g, "<br>");
+		output.innerHTML = `${formatted}`;
+		MathJax.typesetClear();
+		MathJax.typesetPromise([output]);
+	}
+
+	const answer = document.getElementById("answer");
+	const preview = document.getElementById("preview");
+	let debounceTimer;
+	const debounceDelay = 1000;
+	answer.addEventListener("input", () => {
+		clearTimeout(debounceTimer);
+		debounceTimer = setTimeout(() => {
+			latexevent(answer, preview);
+		}, debounceDelay);
+	});
+	const latexCode = "(答)\\(\\boxed{\\dfrac{1}{2}x^2+x+2}\\)";
+	const formatted = latexCode.replace(/\n/g, "<br>");
+	preview.innerHTML = `${formatted}`;
+	MathJax.typesetClear();
+	MathJax.typesetPromise();
+</script>
 {% endblock %}
