@@ -5,10 +5,15 @@
 	<h1>Problems</h1>
 	<div class="list-group my-5">
 		{% for i in data %}
-			<a href="{{ url_for('math.problem', id=i.id) }}" class="list-group-item list-group-item-action">
+			<a href="{{ url_for('math.problem', id=i['id']) }}" class="list-group-item list-group-item-action">
 				<div class="row">
-					<div class="col">{{ i.title }}</div>
-					<div class="col">{{ i.category }}・{{ i.unit }}</div>
+					<div class="col">{{ i["title"] }}</div>
+					<div class="col text-center">
+						{{ i["category"] }}・{{ i["unit"] }}
+					</div>
+					<div class="col text-end">
+						作成者：{{ i["user"] }}
+					</div>
 				</div>
 			</a>
 		{% endfor %}
