@@ -83,7 +83,7 @@
 											<p>答案</p>
 											{{ i["content"] | replace("\r\n", "<br>") | safe }}
 											{% if not(i["judged"]) %}
-											<div>
+											<div class="container" style="max-width: 500px;">
 												<form method="post">
 													{% for j in range(data["score"][2]) %}
 													<div class="mb-3">
@@ -123,7 +123,8 @@
 								</div>
 							</div>
 						{% else %}
-							答案を編集する
+							<h5>答案を編集する</h5>
+							{{submissions["unjudged"]}}
 						{% endif %}
 					{% endif %}
 				{% else %}
