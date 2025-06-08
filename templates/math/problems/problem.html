@@ -56,29 +56,79 @@
 			</div>
 			{% endif %}
 			<div class="mx-5 mb-3">
-				{% if current_user.id==data["userid"] %}
-				<h5>採点する</h5>
-				{% else %}
-				<h5>回答する</h5>
-				<div class="mx-5 card">
-					<div class="card-body">
-						<form method="post">
-							<div class="mb-3">
-								<label for="answer" class="form-label">答案(記述は任意ですが、部分点がもらえる可能性があります。採点者に分かる形で答案を作成してください。)</label>
-								<textarea name="answer" id="answer" class="form-control" rows="6" required placeholder="(答)\(\boxed{\dfrac{1}{2}x^2+x+2}\)"></textarea>
-							</div>
-							<div class="mb-3">
-								<label for="preview" class="form-label">問題文プレビュー</label>
-								<div class="mx-5">
-									<div id="preview" class="border rounded bg-white p-3 mx-5" style="min-height: 120px;"></div>
+				{% if current_user.is_authenticated %}
+					{% if current_user.id==data["userid"] %}
+						<h5>採点する</h5>
+						<div class="accordion mx-5 mb-3" id="judgement-accordion">
+							{% for i in submissions %}
+								<div class="accordion-item">
+									<h2 class="accordion-header">
+										<button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#collapse{{ i['id'] | string }}" aria-expanded="false" aria-controls="collapse{{ i['id'] | string }}">
+											<div class="container">
+												<div class="row">
+													<div class="col text-start">提出 id:{{ i["id"] }}</div>
+													<div class="col text-end">
+														{% if i["judged"] %}
+														採点済み：{{i["score"][1]}}点/{{data["score"][1]}}
+														{% else %}
+														{{ i["created_at"] }}
+														{% endif %}
+													</div>
+												</div>
+											</div>
+										</button>
+									</h2>
+									<div class="accordion-collapse collapse" id="collapse{{ i['id'] | string }}">
+										<div class="accordion-body">
+											<p>答案</p>
+											{{ i["content"] | replace("\r\n", "<br>") | safe }}
+											{% if not(i["judged"]) %}
+											<div>
+												<form method="post">
+													{% for j in range(data["score"][2]) %}
+													<div class="mb-3">
+														<label for="score{{ i['id'] | string }}.{{ j | string }}" class="form-label">問{{ j+1 }}：<span id="value{{ j }}">0</span>点</label>
+														<input type="range" name="score{{ i['id'] | string }}.{{ j | string }}" id="score{{ i['id'] | string }}.{{ j | string }}" class="form-range" min="0" max="{{ data['score'][0][j] }}" value="0" oninput="document.getElementById('value{{ j }}').textContent = this.value">
+													</div>
+													{% endfor %}
+													<div class="mb-3 d-grid"><button type="submit" class="btn btn-primary mb-3" name="btn" value="{{ i['id'] | string }}">採点を確定</button></div>
+												</form>
+											</div>
+											{% endif %}
+										</div>
+									</div>
+								</div>
+							{% endfor %}
+						</div>
+					{% else %}
+						{% if submissions["unjudged"]==[] %}
+							<h5>回答する</h5>
+							<div class="mx-5 card">
+								<div class="card-body">
+									<form method="post">
+										<div class="mb-3">
+											<label for="answer" class="form-label">答案(記述は任意ですが、部分点がもらえる可能性があります。採点者に分かる形で答案を作成してください。)</label>
+											<textarea name="answer" id="answer" class="form-control" rows="6" required placeholder="(答)\(\boxed{\dfrac{1}{2}x^2+x+2}\)"></textarea>
+										</div>
+										<div class="mb-3">
+											<label for="preview" class="form-label">問題文プレビュー</label>
+											<div class="mx-5">
+												<div id="preview" class="border rounded bg-white p-3 mx-5" style="min-height: 120px;"></div>
+											</div>
+										</div>
+										<div class="d-grid">
+											<button type="submit" class="btn btn-primary mb-3">提出</button>
+										</div>
+									</form>
 								</div>
 							</div>
-							<div class="d-grid">
-								<button type="submit" class="btn btn-primary mb-3">提出</button>
-							</div>
-						</form>
-					</div>
-				</div>
+						{% else %}
+							答案を編集する
+						{% endif %}
+					{% endif %}
+				{% else %}
+				<div class="d-grid">
+					<a href="{{ url_for('account.login') }}" class="btn btn-primary">ログインして回答する</a>
 				{% endif %}
 			</div>
 		</div>

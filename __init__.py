@@ -28,8 +28,19 @@ def get_problems(user=None, title=None, content=None, explanation=None, category
 	if unit!=None:query = query.filter_by(unit=unit)
 	if score!=None:query = query.filter_by(score=score)
 	return query.all()
-def get_submission():
-	pass
+def get_submission(id):
+	s = db.session.query(Submissions).get(id)
+	if s.score==None:
+		score = []
+	else:
+		score = list(map(int, s.score.split()))
+	s = {"id": s.id, "userid": int(s.user), "user": User.query.get(s.user).email.split("@")[0], "content": s.content, "score": [score, sum(score), len(score)], "judged": s.judged, "created_at": s.created_at}
+	return s
+def get_submissions(problem, user=None, judged=None):
+	query = db.session.query(Submissions).filter_by(problem=problem)
+	if user!=None:query = query.filter_by(user=user)
+	if judged!=None:query = query.filter_by(judged=judged)
+	return query.all()
 
 @math.route("/latex", methods=["GET", "POST"])
 def latex():
@@ -81,13 +92,30 @@ def problem(id):
 		return abort(404)
 	else:
 		p = get_problem(id)
+		if current_user.is_authenticated:
+			if int(current_user.get_id())==p["userid"]:
+				s = [get_submission(x.id) for x in get_submissions(id, judged=False)] + [get_submission(x.id) for x in get_submissions(id, judged=True)]
+			else:
+				s = {
+					"judged": [get_submission(x.id) for x in get_submissions(id, user=int(current_user.get_id()), judged=1)],
+					"unjudged": [get_submission(x.id) for x in get_submissions(id, user=int(current_user.get_id()), judged=0)]
+				}
+		else:s = []
 		if request.method=="GET":
-			return render_template("math/problems/problem.html", data=p)
+			return render_template("math/problems/problem.html", data=p, submissions=s)
 		else:
 			if "answer" in request.form:
 				submission = Submissions(problem=id, user=int(current_user.get_id()), content=request.form["answer"])
 				db.session.add(submission)
 				db.session.commit()
+			elif "btn" in request.form:
+				score = [request.form[f"score{request.form["btn"]}.{i}"] for i in range(p["score"][2])]
+				print(score)
+				s = db.session.query(Submissions).get(int(request.form["btn"]))
+				s.score = " ".join(score)
+				s.judged = True
+				db.session.commit()
+				print(s.score)
 			return redirect(url_for("math.problem", id=id))
 
 @math.route("/problems/problem/<id>/edit", methods=["GET", "POST"])
