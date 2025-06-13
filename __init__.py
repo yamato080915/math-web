@@ -48,7 +48,7 @@ def latex():
 
 @math.route("/problems", methods=["GET", "POST"])
 def problems():
-	if current_user.get_id()!=None:
+	if current_user.is_authenticated:
 		data = {
 			"my-problem": [get_problem(x.id) for x in get_problems(user=int(current_user.get_id()))],
 			"new": [get_problem(x.id) for x in get_problems() if int(x.user)!=int(current_user.get_id())][-5:],
