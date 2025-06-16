@@ -41,10 +41,15 @@
 	</div>
 	<div class="container my-3">
 		<h4>ランダム問題</h4>
-		<a href="{{ url_for('math.problem', id=data['random'].id) }}" class="list-group-item list-group-item-action">
+		<a href="{{ url_for('math.problem', id=data['random']['id']) }}" class="list-group-item list-group-item-action">
 			<div class="row">
-				<div class="col">{{ data['random'].title }}</div>
-				<div class="col">{{ data['random'].category }}・{{ data['random'].unit }}</div>
+				<div class="col">{{ data['random']["title"] }}</div>
+				<div class="col text-center">
+					{{ data['random']["category"] }}・{{ data['random']["unit"] }}
+				</div>
+				<div class="col text-end">
+					作成者：{{ data['random']["user"] }}
+				</div>
 			</div>
 		</a>
 	</div>
@@ -58,10 +63,15 @@
 			<h4>新規</h4>
 			{% for i in data["new"] %}
 				<div class="list-group">
-					<a href="{{ url_for('math.problem', id=i.id) }}" class="list-group-item list-group-item-action">
+					<a href="{{ url_for('math.problem', id=i['id']) }}" class="list-group-item list-group-item-action">
 						<div class="row">
-							<div class="col">{{ i.title }}</div>
-							<div class="col">{{ i.category }}・{{ i.unit }}</div>
+							<div class="col">{{ i["title"] }}</div>
+							<div class="col text-center">
+								{{ i["category"] }}・{{ i["unit"] }}
+							</div>
+							<div class="col text-end">
+								作成者：{{ i["user"] }}
+							</div>
 						</div>
 					</a>
 				</div>
@@ -72,10 +82,15 @@
 		<h4>自分の問題</h4>
 		<div class="list-group">
 			{% for i in data["my-problem"] %}
-				<a href="{{ url_for('math.problem', id=i.id) }}" class="list-group-item list-group-item-action">
+				<a href="{{ url_for('math.problem', id=i['id']) }}" class="list-group-item list-group-item-action">
 					<div class="row">
-						<div class="col">{{ i.title }}</div>
-						<div class="col">{{ i.category }}・{{ i.unit }}</div>
+						<div class="col">{{ i["title"] }}</div>
+						<div class="col text-center">
+							{{ i["category"] }}・{{ i["unit"] }}
+						</div>
+						<div class="col text-end">
+							作成者：{{ i["user"] }}
+						</div>
 					</div>
 				</a>
 			{% endfor %}
