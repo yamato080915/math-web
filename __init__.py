@@ -129,10 +129,11 @@ def edit(id):
 		else:
 			return abort(403)
 	elif request.method=="POST":
-		if p["title"]!=request.form["title"]:p["title"] = request.form["title"]
-		if p["content"]!=request.form["content"]:p["content"] = request.form["content"]
-		if p["explanation"]!=request.form["explanation"]:p["explanation"] = request.form["explanation"]
-		if p["category"]!=request.form["category"]:p["category"] = request.form["category"]
-		if p["unit"]!=request.form["unit"]:p["unit"] = request.form["unit"]
+		query = db.session.query(MathProblems).get(int(id))
+		if p["title"]!=request.form["title"]:query.title = request.form["title"]
+		if p["content"]!=request.form["content"]:query.content = request.form["content"]
+		if p["explanation"]!=request.form["explanation"]:query.explanation = request.form["explanation"]
+		if p["category"]!=request.form["category"]:query.category = request.form["category"]
+		if p["unit"]!=request.form["unit"]:query.unit = request.form["unit"]
 		db.session.commit()
 		return redirect(url_for("math.problem", id=id).replace('index.cgi/', ''))
