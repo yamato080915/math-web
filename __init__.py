@@ -20,13 +20,13 @@ def get_problem(id):
 	return p
 def get_problems(user=None, title=None, content=None, explanation=None, category=None, unit=None, score=None):
 	query = db.session.query(MathProblems)
-	if user!=None:query = query.filter_by(user=user)
-	if title!=None:query = query.filter_by(title=title)
-	if content!=None:query = query.filter_by(content=content)
-	if explanation!=None:query = query.filter_by(explanation=explanation)
-	if category!=None:query = query.filter_by(category=category)
-	if unit!=None:query = query.filter_by(unit=unit)
-	if score!=None:query = query.filter_by(score=score)
+	if user is not None:query = query.filter_by(user=user)
+	if title is not None:query = query.filter_by(title=title)
+	if content is not None:query = query.filter_by(content=content)
+	if explanation is not None:query = query.filter_by(explanation=explanation)
+	if category is not None:query = query.filter_by(category=category)
+	if unit is not None:query = query.filter_by(unit=unit)
+	if score is not None:query = query.filter_by(score=score)
 	return query.all()
 def get_submission(id):
 	s = db.session.query(Submissions).get(id)
@@ -38,8 +38,8 @@ def get_submission(id):
 	return s
 def get_submissions(problem, user=None, judged=None):
 	query = db.session.query(Submissions).filter_by(problem=problem)
-	if user!=None:query = query.filter_by(user=user)
-	if judged!=None:query = query.filter_by(judged=judged)
+	if user is not None:query = query.filter_by(user=user)
+	if judged is not None:query = query.filter_by(judged=judged)
 	return query.all()
 
 @math.route("/latex", methods=["GET", "POST"])
