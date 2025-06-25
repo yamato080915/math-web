@@ -76,7 +76,7 @@ def post():
 			score = list(map(int, request.form["score"].split("\r\n")))
 		except:
 			flash("error.score")
-			return redirect(url_for("math.post"))
+			return redirect(url_for("math.post").replace("/index.cgi", ""))
 		score = " ".join([str(x) for x in score])
 		if get_problems(user=int(current_user.get_id()), content=request.form["content"])==[]:
 			problem = MathProblems(user=int(current_user.get_id()), title=request.form["title"], content=request.form["content"], explanation=request.form["explanation"], category=request.form["category"], unit=request.form["unit"], score=score)
@@ -116,7 +116,7 @@ def problem(id):
 				s.judged = True
 				db.session.commit()
 				print(s.score)
-			return redirect(url_for("math.problem", id=id))
+			return redirect(url_for("math.problem", id=id).replace("/index.cgi", ""))
 
 @math.route("/problems/problem/<id>/edit", methods=["GET", "POST"])
 @login_required
