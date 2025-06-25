@@ -23,8 +23,8 @@
 				</button>
 				<div class="collapse navbar-collapse" id="navbarNavAltMarkup">
 					<div class="navbar-nav me-auto">
-						<a href="{{ url_for('math.problems').replace('index.cgi/', '') }}" class="nav-link">Problems</a>
-						<a href="{{ url_for('math.latex').replace('index.cgi/', '') }}" class="nav-link">LaTeX</a>
+						<a href="{{ url_for('math.problems') }}" class="nav-link">Problems</a>
+						<a href="{{ url_for('math.latex') }}" class="nav-link">LaTeX</a>
 					</div>
 					<div class="navbar-nav">
 						<div class="nav-item dropdown">
@@ -37,11 +37,11 @@
 							</a>
 							<ul class="dropdown-menu dropdown-menu-dark">
 								{% if current_user.is_authenticated %}
-									<li><a href="{{ url_for('account.account').replace('index.cgi/', '') }}" class="dropdown-item">Account Settings</a></li>
-									<li><a href="{{ url_for('account.logout').replace('index.cgi/', '') }}" class="dropdown-item">Logout</a></li>
+									<li><a href="{{ url_for('account.account') }}" class="dropdown-item">Account Settings</a></li>
+									<li><a href="{{ url_for('account.logout') }}" class="dropdown-item">Logout</a></li>
 								{% else %}
-									<li><a href="{{ url_for('account.login').replace('index.cgi/', '') }}" class="dropdown-item">Login</a></li>
-									<li><a href="{{ url_for('account.register').replace('index.cgi/', '') }}" class="dropdown-item">Sign Up</a></li>
+									<li><a href="{{ url_for('account.login') }}" class="dropdown-item">Login</a></li>
+									<li><a href="{{ url_for('account.register') }}" class="dropdown-item">Sign Up</a></li>
 								{% endif %}
 							</ul>
 						</div>

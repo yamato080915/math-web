@@ -12,7 +12,7 @@
 				</div>
 				<div class="col text-end">
 					{% if current_user.id==data["userid"] %}
-					<a href="{{ url_for('math.edit', id=data['id']).replace('index.cgi/', '') }}" class="btn btn-primary">編集</a>
+					<a href="{{ url_for('math.edit', id=data['id']) }}" class="btn btn-primary">編集</a>
 					{% endif %}
 				</div>
 			</div>

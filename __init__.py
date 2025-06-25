@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, request, redirect, url_for, jsonify, abort, flash
+from flask import Blueprint, render_template, request, redirect, jsonify, abort, flash
+from myfunc import url_for
 from flask_login import login_required, current_user
 
 from models import User, MathProblems, Submissions
@@ -76,14 +77,14 @@ def post():
 			score = list(map(int, request.form["score"].split("\r\n")))
 		except:
 			flash("error.score")
-			return redirect(url_for("math.post").replace("/index.cgi", ""))
+			return redirect(url_for("math.post"))
 		score = " ".join([str(x) for x in score])
 		if get_problems(user=int(current_user.get_id()), content=request.form["content"])==[]:
 			problem = MathProblems(user=int(current_user.get_id()), title=request.form["title"], content=request.form["content"], explanation=request.form["explanation"], category=request.form["category"], unit=request.form["unit"], score=score)
 			db.session.add(problem)
 			db.session.commit()
 		p = get_problems(user=int(current_user.get_id()), content=request.form["content"])[0]
-		return redirect(url_for("math.problem", id=p.id).replace('index.cgi/', ''))
+		return redirect(url_for("math.problem", id=p.id))
 
 @math.route("/problems/problem/<id>", methods=["GET", "POST"])
 def problem(id):
@@ -116,7 +117,7 @@ def problem(id):
 				s.judged = True
 				db.session.commit()
 				print(s.score)
-			return redirect(url_for("math.problem", id=id).replace("/index.cgi", ""))
+			return redirect(url_for("math.problem", id=id))
 
 @math.route("/problems/problem/<id>/edit", methods=["GET", "POST"])
 @login_required
@@ -136,4 +137,4 @@ def edit(id):
 		if p["category"]!=request.form["category"]:query.category = request.form["category"]
 		if p["unit"]!=request.form["unit"]:query.unit = request.form["unit"]
 		db.session.commit()
-		return redirect(url_for("math.problem", id=id).replace('index.cgi/', ''))
+		return redirect(url_for("math.problem", id=id))
