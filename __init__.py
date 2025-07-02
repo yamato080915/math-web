@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, jsonify, abort, flash
-from myfunc import url_for
+from myfunc import url_for, get_username
 from flask_login import login_required, current_user
 
 from models import User, MathProblems, Submissions
@@ -17,7 +17,7 @@ math = Blueprint(
 def get_problem(id):
 	p = db.session.query(MathProblems).get(id)
 	score = list(map(int, p.score.split()))
-	p = {"id":p.id, "userid":int(p.user), "user":User.query.get(p.user).email.split("@")[0], "title":p.title, "content":p.content, "explanation":p.explanation, "category":p.category, "unit":p.unit, "score":[score, sum(score), len(score)], "created_at":p.created_at}
+	p = {"id":p.id, "userid":int(p.user), "user":get_username(p.user), "title":p.title, "content":p.content, "explanation":p.explanation, "category":p.category, "unit":p.unit, "score":[score, sum(score), len(score)], "created_at":p.created_at}
 	return p
 def get_problems(user=None, title=None, content=None, explanation=None, category=None, unit=None, score=None):
 	query = db.session.query(MathProblems)
@@ -35,7 +35,7 @@ def get_submission(id):
 		score = []
 	else:
 		score = list(map(int, s.score.split()))
-	s = {"id": s.id, "userid": int(s.user), "user": User.query.get(s.user).email.split("@")[0], "content": s.content, "score": [score, sum(score), len(score)], "judged": s.judged, "created_at": s.created_at}
+	s = {"id": s.id, "userid": int(s.user), "user": get_username(s.user), "content": s.content, "score": [score, sum(score), len(score)], "judged": s.judged, "created_at": s.created_at}
 	return s
 def get_submissions(problem, user=None, judged=None):
 	query = db.session.query(Submissions).filter_by(problem=problem)

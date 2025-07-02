@@ -30,7 +30,7 @@
 						<div class="nav-item dropdown">
 							<a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
 								{% if current_user.is_authenticated %}
-									{{ current_user.email.split('@')[0] }}
+									{{ get_username(current_user) }}
 								{% else %}
 									Account
 								{% endif %}
