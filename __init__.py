@@ -3,9 +3,14 @@ from myfunc import url_for, get_username
 from flask_login import login_required, current_user
 
 from models import User, MathProblems, Submissions
-from app import db
+from app import db, app
 
 from random import randint
+
+def math_format(text):
+	return text.replace("[終]", '<p style="text-align: right; padding-right: 10%;">(終)</p>')
+
+app.jinja_env.globals["math_format"] = math_format
 
 math = Blueprint(
 	"math", 

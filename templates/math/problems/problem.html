@@ -20,7 +20,8 @@
 				<h5>問題文</h5>
 				<div class="card" style="max-width: 1000px;margin: 0 auto;">
 					<div class="card-body">
-						{{ data["content"] | replace("\r\n", "<br>") | safe }}
+						{{ math_format(data["content"] | replace("\r\n", "<br>")) | safe }}
+						{% if data["content"][-1]!="\n" %}
 					</div>
 				</div>
 			</div>
@@ -49,7 +50,7 @@
 					</h2>
 					<div class="accordion-collapse collapse" id="explanation-accordion-body">
 						<div class="accordion-body">
-							{{ data["explanation"] | replace("\r\n", "<br>") | safe }}
+							{{ math_format(data["explanation"] | replace("\r\n", "<br>")) | safe }}
 						</div>
 					</div>
 				</div>
@@ -81,7 +82,7 @@
 									<div class="accordion-collapse collapse" id="collapse{{ i['id'] | string }}">
 										<div class="accordion-body">
 											<p>答案</p>
-											{{ i["content"] | replace("\r\n", "<br>") | safe }}
+											{{ math_format(i["content"] | replace("\r\n", "<br>")) | safe }}
 											{% if not(i["judged"]) %}
 											<div class="container" style="max-width: 500px;">
 												<form method="post">
