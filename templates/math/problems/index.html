@@ -2,7 +2,14 @@
 {% block title %}Math Problems{% endblock %}
 {% block content %}
 <div class="container mt-5">
-	<h1>Problems</h1>
+	<div class="row">
+		<div class="col">
+			<h1>Problems</h1>
+		</div>
+		<div class="col text-end">
+			<a href="{{ url_for('math.post') }}" class="btn btn-primary">問題を投稿</a>
+		</div>
+	</div>
 	<div class="container my-3">
 		<h4>単元から選択</h4>
 		<div class="accordion" id="categoryAccordion">
