@@ -3,7 +3,7 @@ from myfunc import url_for, get_username
 from flask_login import login_required, current_user
 
 from models import User, MathProblems, Submissions
-from app import db
+from app import db, app
 
 from random import randint
 
@@ -14,6 +14,8 @@ math = Blueprint(
 	template_folder="./templates",
 	static_url_path="/statics"
 )
+
+app.jinja_env.globals["latex_format"] = lambda x: x.replace("\r\n", "<br>").replace("[終]", "<p style='text-align: right; padding-right: 10%;'>(終)</p>")
 
 def get_problem(id):
 	p = db.session.query(MathProblems).get(id)
