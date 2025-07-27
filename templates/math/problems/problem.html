@@ -140,9 +140,6 @@
 	listener(answer, preview);
 
 	const latexCode = "(答)\\(\\boxed{\\dfrac{1}{2}x^2+x+2}\\)";
-	const formatted = latexCode.replace(/\n/g, "<br>");
-	preview.innerHTML = `${formatted}`;
-	MathJax.typesetClear();
-	MathJax.typesetPromise();
+	mathjaxupdate(preview, latexCode);
 </script>
 {% endblock %}

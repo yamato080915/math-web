@@ -137,10 +137,7 @@
 	});
 	
 	const latexCode = "\\(\\text{sample}\\)\n2次方程式\\(\\ ax^2+bx+c=0\\ (a\\neq 0)\\ \\)の解は\\[\\ x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a} \\ \\]である。\\[\\int_{-\\infty}^{\\infty} e^{-x^2} \\, dx = \\sqrt{\\pi}\\]";
-	const formatted = latexCode.replace(/\n/g, "<br>");
-	preview.innerHTML = `${formatted}`;
-	MathJax.typesetClear();
-	MathJax.typesetPromise();
+	mathjaxupdate(preview, latexCode);
 
 </script>
 {% endblock %}
