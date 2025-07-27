@@ -10,8 +10,9 @@ from random import randint
 math = Blueprint(
 	"math", 
 	__name__, 
-	static_folder="static",
-	template_folder="./templates"
+	static_folder="./statics",
+	template_folder="./templates",
+	static_url_path="/statics"
 )
 
 def get_problem(id):

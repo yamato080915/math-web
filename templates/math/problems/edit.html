@@ -53,35 +53,15 @@
 		</div>
 	</div>
 </div>
-<script>//LaTeX
-	function latexevent(input, output) {
-		const latexCode = input.value;
-		const formatted = latexCode.replace(/\n/g, "<br>");
-		output.innerHTML = `${formatted}`;
-		MathJax.typesetClear();
-		MathJax.typesetPromise([output]);
-	}
-
+<script src="{{ url_for('math.static', filename='js/event.js') }}"></script>
+<script>
 	const content = document.getElementById("content");
 	const preview = document.getElementById("preview");
-	let debounceTimer;
-	const debounceDelay = 1000;
-	content.addEventListener("input", () => {
-		clearTimeout(debounceTimer);
-		debounceTimer = setTimeout(() => {
-			latexevent(content, preview);
-		}, debounceDelay);
-	});
+	listener(content, preview);
 
 	const explanation = document.getElementById("explanation");
 	const preview2 = document.getElementById("preview2");
-	let debounceTimer2;
-	explanation.addEventListener("input", () => {
-		clearTimeout(debounceTimer2);
-		debounceTimer2 = setTimeout(() => {
-			latexevent(explanation, preview2);
-		}, debounceDelay);
-	});
+	listener(explanation, preview2);
 
 	const unitMap = {
 		"数学Ⅰ": ["数と式", "2次関数", "集合と命題", "図形と計量", "データの分析"],

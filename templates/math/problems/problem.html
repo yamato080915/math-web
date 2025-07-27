@@ -133,25 +133,12 @@
 		</div>
 	</div>
 </div>
+<script src="{{ url_for('math.static', filename='js/event.js') }}"></script>
 <script>
-	function latexevent(input, output) {
-		const latexCode = input.value;
-		const formatted = latexCode.replace(/\n/g, "<br>");
-		output.innerHTML = `${formatted}`;
-		MathJax.typesetClear();
-		MathJax.typesetPromise([output]);
-	}
-
 	const answer = document.getElementById("answer");
 	const preview = document.getElementById("preview");
-	let debounceTimer;
-	const debounceDelay = 1000;
-	answer.addEventListener("input", () => {
-		clearTimeout(debounceTimer);
-		debounceTimer = setTimeout(() => {
-			latexevent(answer, preview);
-		}, debounceDelay);
-	});
+	listener(answer, preview);
+
 	const latexCode = "(答)\\(\\boxed{\\dfrac{1}{2}x^2+x+2}\\)";
 	const formatted = latexCode.replace(/\n/g, "<br>");
 	preview.innerHTML = `${formatted}`;
