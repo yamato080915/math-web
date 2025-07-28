@@ -172,6 +172,8 @@
 						`;
 						container.appendChild(problemElement);
 					});
+					MathJax.typesetClear();
+					MathJax.typesetPromise([container]);
 				} else {
 					container.innerHTML = '<p>該当する問題がありません。</p>';
 				}
