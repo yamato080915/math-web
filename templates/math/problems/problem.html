@@ -133,7 +133,7 @@
 		</div>
 	</div>
 </div>
-<script src="{{ url_for('math.static', filename='js/event.js') }}"></script>
+{% include "math/problems/event.js.html" %}
 <script>
 	const answer = document.getElementById("answer");
 	const preview = document.getElementById("preview");

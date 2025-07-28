@@ -31,12 +31,12 @@
 					<div class="accordion-collapse collapse" id="{{ i }}units" aria-labelledby="{{ i }}">
 						<ul class="list-group">
 							<li class="list-group-item">
-								<input type="checkbox" name="All{{i}}" id="All{{i}}" class="form-check-input me-1">
+								<input type="checkbox" name="All{{i}}" id="All{{i}}" class="form-check-input me-1 select-all" data-category="{{ i }}">
 								<label for="All{{i}}" class="form-check-label">すべて選択</label>
 							</li>
 							{% for j in math[i] %}
 								<li class="list-group-item">
-									<input type="checkbox" name="All{{i}}{{j}}" id="All{{i}}{{j}}" class="form-check-input me-1">
+									<input type="checkbox" name="All{{i}}{{j}}" id="All{{i}}{{j}}" class="form-check-input me-1 unit-checkbox" data-category="{{ i }}">
 									<label for="All{{i}}{{j}}" class="form-check-label">{{j}}</label>
 								</li>
 							{% endfor %}
@@ -107,4 +107,18 @@
 		<a href="{{ url_for('math.problemsAll') }}" class="btn btn-primary d-grid">問題をすべて見る</a>
 	</div>
 </div>
+<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		const selectAllCheckboxes = document.querySelectorAll('.select-all');
+		selectAllCheckboxes.forEach(selectAll => {
+			selectAll.addEventListener('change', (event) => {
+				const category = event.target.dataset.category;
+				const unitCheckboxes = document.querySelectorAll(`.unit-checkbox[data-category="${category}"]`);
+				unitCheckboxes.forEach(checkbox => {
+					checkbox.checked = event.target.checked;
+				});
+			});
+		});
+	});
+</script>
 {% endblock %}
