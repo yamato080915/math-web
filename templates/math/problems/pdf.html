@@ -1,0 +1,7 @@
+{% extends "math/layout.html" %}
+{% block title %}{{ data["title"] }}{% endblock %}
+{% block content %}
+<div>
+    {{ math_format(data["content"]) | replace("\r\n", "<br>") | safe }}
+</div>
+{% endblock %}

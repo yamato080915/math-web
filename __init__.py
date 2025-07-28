@@ -148,3 +148,12 @@ def edit(id):
 		if p["unit"]!=request.form["unit"]:query.unit = request.form["unit"]
 		db.session.commit()
 		return redirect(url_for("math.problem", id=id))
+
+@math.route("/problems/problem/<id>/pdf")
+@login_required
+def pdf(id):
+	p = get_problem(id)
+	if p==None:
+		return abort(404)
+	else:
+		return render_template("math/problems/pdf.html", data=p)
