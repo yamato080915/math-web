@@ -150,7 +150,6 @@ def edit(id):
 		return redirect(url_for("math.problem", id=id))
 
 @math.route("/problems/problem/<id>/pdf")
-@login_required
 def pdf(id):
 	p = get_problem(id)
 	if p==None:
