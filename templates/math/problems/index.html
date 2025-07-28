@@ -135,14 +135,18 @@
 		});
 
 		async function updateSelectedUnitsDisplay() {
-			const selectedUnits = Array.from(document.querySelectorAll('.unit-checkbox:checked')).map(checkbox => checkbox.dataset.unit);
+			const selectedUnits = Array.from(document.querySelectorAll('.unit-checkbox:checked')).map(checkbox => [
+				checkbox.dataset.category,
+				checkbox.dataset.unit
+			]);
+
 			try {
 				const response = await fetch("{{ url_for('math.problemsAll') }}", {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json"
 					},
-					body: JSON.stringify({ units: selectedUnits })
+					body: JSON.stringify({ data: selectedUnits })
 				});
 
 				if (!response.ok) {

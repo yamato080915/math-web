@@ -75,7 +75,7 @@ def problemsAll():
 		return render_template("math/problems/all.html", data=[get_problem(x.id) for x in get_problems()])
 	else:
 		data = request.get_json()
-		return jsonify({"data": [get_problem(x.id) for x in get_problems() if x.unit in data["units"]]})
+		return jsonify({"data": [get_problem(x.id) for x in get_problems() if [x.category, x.unit] in data["data"]]})
 
 @math.route("/problems/post", methods=["GET", "POST"])
 @login_required
