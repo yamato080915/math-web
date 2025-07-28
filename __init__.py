@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, jsonify, abort, flash, make_response
+from flask import Blueprint, render_template, request, redirect, jsonify, abort, flash
 from myfunc import url_for, get_username
 from flask_login import login_required, current_user
 
@@ -6,7 +6,6 @@ from models import User, MathProblems, Submissions
 from app import db, app
 
 from random import randint
-import pdfkit
 
 def math_format(text):
 	return text.replace("[終]", '<p style="text-align: right; padding-right: 10%;">(終)</p>')
@@ -156,16 +155,4 @@ def pdf(id):
 	if p==None:
 		return abort(404)
 	else:
-		
-		# HTMLテンプレートをレンダリング
-		html = render_template("math/problems/pdf.html", data=p)
-		
-		# PDFに変換
-		pdf = pdfkit.from_string(html, False)
-		
-		# レスポンスを作成
-		response = make_response(pdf)
-		response.headers['Content-Type'] = 'application/pdf'
-		response.headers['Content-Disposition'] = f'inline; filename=problem_{id}.pdf'
-		
-		return response
+		return render_template("math/problems/pdf.html", data=p)
