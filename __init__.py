@@ -6,7 +6,6 @@ from models import User, MathProblems, Submissions
 from app import db, app
 
 from random import randint
-from spire.doc import Document, FileFormat
 
 def math_format(text):
 	return text.replace("[終]", '<p style="text-align: right; padding-right: 10%;">(終)</p>')
@@ -156,9 +155,4 @@ def pdf(id):
 	if p==None:
 		return abort(404)
 	else:
-		doc = Document()
-		sec = doc.AddSection()
-		par = sec.AddParagraph()
-		par.AppendHTML(render_template("math/problems/pdf.html", data=p))
-		doc.SaveToFile(f"problem_{id}.pdf", FileFormat.PDF)
-		doc.Close()
+		return render_template("math/problems/pdf.html", data=p)
