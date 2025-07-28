@@ -47,9 +47,9 @@
 		</div>
 	</div>
 	<div class="container my-3">
-		<h4>選択された単元</h4>
-		<div id="selectedUnitsDisplay" class="alert alert-info">
-			選択された単元はありません。
+		<h4>選択した単元の問題</h4>
+		<div id="filteredProblems" class="list-group">
+			<p>該当する問題がありません。</p>
 		</div>
 	</div>
 	<div class="container my-3">
@@ -123,32 +123,56 @@
 				unitCheckboxes.forEach(checkbox => {
 					checkbox.checked = event.target.checked;
 				});
-				updateSelectedUnitsDisplay();
 			});
 		});
 
-		// すべてのチェックボックスを取得
 		const allCheckboxes = document.querySelectorAll('.form-check-input');
 
-		// チェックボックスの変更イベントを監視
 		allCheckboxes.forEach(checkbox => {
 			checkbox.addEventListener('change', () => {
 				updateSelectedUnitsDisplay();
 			});
 		});
 
-		// 選択された単元を表示する関数
-		function updateSelectedUnitsDisplay() {
-			const selectedUnits = Array.from(document.querySelectorAll('.unit-checkbox:checked')).map(checkbox => ({
-				category: checkbox.dataset.category,
-				unit: checkbox.dataset.unit
-			}));
+		async function updateSelectedUnitsDisplay() {
+			const selectedUnits = Array.from(document.querySelectorAll('.unit-checkbox:checked')).map(checkbox => checkbox.dataset.unit);
+			try {
+				const response = await fetch("{{ url_for('math.problemsAll') }}", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json"
+					},
+					body: JSON.stringify({ units: selectedUnits })
+				});
 
-			const displayElement = document.getElementById('selectedUnitsDisplay');
-			if (selectedUnits.length > 0) {
-				displayElement.innerHTML = selectedUnits.map(unit => `${unit.category} - ${unit.unit}`).join('<br>');
-			} else {
-				displayElement.innerHTML = '選択された単元はありません。';
+				if (!response.ok) {
+					throw new Error("データの取得に失敗しました。");
+				}
+
+				const data = await response.json();
+
+				// データを表示
+				const container = document.getElementById('filteredProblems');
+				container.innerHTML = '';
+				if (data.data.length > 0) {
+					data.data.forEach(problem => {
+						const problemElement = document.createElement('a');
+						problemElement.href = `{{ url_for('math.problem', id='') }}${problem.id}`;
+						problemElement.className = 'list-group-item list-group-item-action';
+						problemElement.innerHTML = `
+							<div class="row">
+								<div class="col">${problem.title}</div>
+								<div class="col text-center">${problem.category}・${problem.unit}</div>
+								<div class="col text-end">作成者：${problem.user}</div>
+							</div>
+						`;
+						container.appendChild(problemElement);
+					});
+				} else {
+					container.innerHTML = '<p>該当する問題がありません。</p>';
+				}
+			} catch (error) {
+				console.error("エラー:", error);
 			}
 		}
 	});

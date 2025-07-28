@@ -71,7 +71,11 @@ def problems():
 
 @math.route("/problems/all", methods=["GET", "POST"])
 def problemsAll():
-	return render_template("math/problems/all.html", data=[get_problem(x.id) for x in get_problems()])
+	if request.method == "GET":
+		return render_template("math/problems/all.html", data=[get_problem(x.id) for x in get_problems()])
+	else:
+		data = request.get_json()
+		return jsonify({"data": [get_problem(x.id) for x in get_problems() if x.unit in data["units"]]})
 
 @math.route("/problems/post", methods=["GET", "POST"])
 @login_required
