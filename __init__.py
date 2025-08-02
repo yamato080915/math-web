@@ -41,7 +41,7 @@ def get_submission(id):
 		score = []
 	else:
 		score = list(map(int, s.score.split()))
-	s = {"id": s.id, "userid": int(s.user), "user": get_username(s.user), "content": s.content, "score": [score, sum(score), len(score)], "judged": s.judged, "created_at": s.created_at}
+	s = {"id": s.id, "userid": int(s.user), "user": get_username(s.user), "content": s.content, "score": [score, sum(score), len(score)], "judged": s.judged, "comment": s.comment, "created_at": s.created_at}
 	return s
 def get_submissions(problem, user=None, judged=None):
 	query = db.session.query(Submissions).filter_by(problem=problem)
@@ -106,11 +106,13 @@ def problem(id):
 		if current_user.is_authenticated:
 			if int(current_user.get_id())==p["userid"]:
 				s = [get_submission(x.id) for x in get_submissions(id, judged=False)] + [get_submission(x.id) for x in get_submissions(id, judged=True)]
-			else:
+			elif get_submissions(id, user=int(current_user.get_id())):
 				s = {
-					"judged": [get_submission(x.id) for x in get_submissions(id, user=int(current_user.get_id()), judged=1)],
-					"unjudged": [get_submission(x.id) for x in get_submissions(id, user=int(current_user.get_id()), judged=0)]
+					"my_answer": get_submission(get_submissions(id, user=int(current_user.get_id()))[0].id),
+					"all_answers": [get_submission(x.id) for x in get_submissions(id, judged=True) if x.user!=int(current_user.get_id())],
 				}
+			else:
+				s = []
 		else:s = []
 		if request.method=="GET":
 			return render_template("math/problems/problem.html", data=p, submissions=s)
@@ -121,12 +123,15 @@ def problem(id):
 				db.session.commit()
 			elif "btn" in request.form:
 				score = [request.form[f"score{request.form["btn"]}.{i}"] for i in range(p["score"][2])]
-				print(score)
 				s = db.session.query(Submissions).get(int(request.form["btn"]))
 				s.score = " ".join(score)
 				s.judged = True
+				s.comment = request.form[f"comment{request.form['btn']}"]
 				db.session.commit()
-				print(s.score)
+			elif "re-answer" in request.form:
+				s = get_submissions(id, user=int(current_user.get_id()))[0]
+				s.content = request.form["re-answer"]
+				db.session.commit()
 			return redirect(url_for("math.problem", id=id))
 
 @math.route("/problems/problem/<id>/edit", methods=["GET", "POST"])

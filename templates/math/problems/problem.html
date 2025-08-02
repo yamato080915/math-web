@@ -39,7 +39,7 @@
 					</div>
 				</div>
 			</div>
-			{% if current_user.id==data["userid"] %}
+			{% if current_user.id==data["userid"] or (current_user.is_authenticated and "my_answer" in submissions and submissions["my_answer"]["judged"]) %}
 			<div class="accordion mb-3" id="explanation-accordion" style="max-width: 1180px;margin: 0 auto;">
 				<div class="accordion-item" style="max-width: 1000px;margin: 0 auto;">
 					<h2 class="accordion-header">
@@ -80,7 +80,7 @@
 									</h2>
 									<div class="accordion-collapse collapse" id="collapse{{ i['id'] | string }}">
 										<div class="accordion-body">
-											<p>答案</p>
+											<h6>答案</h6>
 											{{ math_format(i["content"]) | replace("\r\n", "<br>") | safe }}
 											{% if not(i["judged"]) %}
 											<div class="container" style="max-width: 500px;">
@@ -91,9 +91,23 @@
 														<input type="range" name="score{{ i['id'] | string }}.{{ j | string }}" id="score{{ i['id'] | string }}.{{ j | string }}" class="form-range" min="0" max="{{ data['score'][0][j] }}" value="0" oninput="document.getElementById('value{{ j }}').textContent = this.value">
 													</div>
 													{% endfor %}
+													<div class="mb-3">
+														<label for="comment{{ i['id'] | string }}" class="form-label">採点者のコメント</label>
+														<textarea name="comment{{ i['id'] | string }}" id="comment{{ i['id'] | string }}" class="form-control" rows="3" placeholder="採点者のコメントを入力してください。(部分点の根拠など)"></textarea>
+													</div>
 													<div class="mb-3 d-grid"><button type="submit" class="btn btn-primary mb-3" name="btn" value="{{ i['id'] | string }}">採点を確定</button></div>
 												</form>
 											</div>
+											{% else %}
+											<hr>
+											<h6>得点</h6>
+											<p>
+												{% for j in range(i["score"][2]) %}
+													問{{ j+1 }}: {{ i["score"][0][j] }}点 / {{ data["score"][0][j] }}点<br>
+												{% endfor %}
+											</p>
+											<h6>採点者のコメント</h6>
+											<p>{{ i["comment"] }}</p>
 											{% endif %}
 										</div>
 									</div>
@@ -101,7 +115,7 @@
 							{% endfor %}
 						</div>
 					{% else %}
-						{% if submissions["unjudged"]==[] %}
+						{% if submissions == [] %}
 							<h5>回答する</h5>
 							<div class="card" style="max-width: 1000px;margin: 0 auto;">
 								<div class="card-body">
@@ -121,8 +135,67 @@
 								</div>
 							</div>
 						{% else %}
-							<h5>答案を編集する</h5>
-							{{submissions["unjudged"]}}
+							{% if submissions["my_answer"]["judged"] %}
+								<h5>回答</h5>
+								<div class="accordion mb-3" id="judgement-accordion" style="max-width: 1000px;margin: 0 auto;">
+									{% for i in [submissions["my_answer"]] + submissions["all_answers"] %}
+										{% if i["userid"]==current_user.id %}
+											<h5>自分の回答</h5>
+										{% endif %}
+										<div class="accordion-item">
+											<h2 class="accordion-header">
+												<button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#collapse{{ i['id'] | string }}" aria-expanded="false" aria-controls="collapse{{ i['id'] | string }}">
+													<div class="container">
+														<div class="row">
+															<div class="col text-start">提出 id:{{ i["id"] }}</div>
+															<div class="col text-end">
+																採点済み：{{i["score"][1]}}点/{{data["score"][1]}}
+															</div>
+														</div>
+													</div>
+												</button>
+											</h2>
+											<div class="accordion-collapse collapse" id="collapse{{ i['id'] | string }}">
+												<div class="accordion-body">
+													<h6>答案</h6>
+													{{ math_format(i["content"]) | replace("\r\n", "<br>") | safe }}
+													<hr>
+													<h6>得点</h6>
+													<p>
+														{% for j in range(i["score"][2]) %}
+															問{{ j+1 }}: {{ i["score"][0][j] }}点 / {{ data["score"][0][j] }}点<br>
+														{% endfor %}
+													</p>
+													<h6>採点者のコメント</h6>
+													<p>{{ i["comment"] }}</p>
+												</div>
+											</div>
+										</div>
+										{% if i["userid"]==current_user.id and submissions["all_answers"] | length != 0 %}
+											<h5>ほかの人の回答</h5>
+										{% endif %}
+									{% endfor %}
+								</div>
+							{% else %}
+								<h5>答案を編集する</h5>
+								<div class="card" style="max-width: 1000px;margin: 0 auto;">
+									<div class="card-body">
+										<form method="post">
+											<div class="mb-3">
+												<label for="re-answer" class="form-label">答案</label>
+												<textarea name="re-answer" id="re-answer" class="form-control" rows="6" required placeholder="(答)\(\boxed{\dfrac{1}{2}x^2+x+2}\)">{{ submissions["my_answer"]["content"] }}</textarea>
+											</div>
+											<div class="mb-3">
+												<label for="re-preview" class="form-label">問題文プレビュー</label>
+												<div id="re-preview" class="border rounded bg-white p-3" style="min-height: 120px;">{{ math_format(submissions["my_answer"]["content"]) | replace("\r\n", "<br>") | safe }}</div>
+											</div>
+											<div class="d-grid">
+												<button type="submit" class="btn btn-primary mb-3">提出</button>
+											</div>
+										</form>
+									</div>
+								</div>
+							{% endif %}
 						{% endif %}
 					{% endif %}
 				{% else %}
@@ -143,6 +216,12 @@
 
 		const latexCode = "(答)\\(\\boxed{\\dfrac{1}{2}x^2+x+2}\\)";
 		mathjaxupdate(preview, latexCode);
+	}
+
+	const reAnswer = document.getElementById("re-answer");
+	const rePreview = document.getElementById("re-preview");
+	if (reAnswer && rePreview) {
+		listener(reAnswer, rePreview);
 	}
 </script>
 {% endblock %}
