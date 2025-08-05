@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, jsonify, abort, flash
+from flask import Blueprint, render_template, request, redirect, jsonify, abort, flash, make_response
 from myfunc import url_for, get_username
 from flask_login import login_required, current_user
 
@@ -19,6 +19,13 @@ math = Blueprint(
 	template_folder="./templates",
 	static_url_path="/statics"
 )
+
+@math.route("/fonts/<font>")
+def serve_fonts(font):
+	if font in ["HaranoAjiMincho-Regular.otf"]:
+		response = make_response(math.send_static_file(f"fonts/{font}"))
+		response.headers["Cache-Control"] = 'public, max-age=86400'
+		return response
 
 def get_problem(id):
 	p = db.session.query(MathProblems).get(id)

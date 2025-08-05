@@ -15,7 +15,8 @@
 	<style>
 		@font-face {
 			font-family: "HaranoAjiMincho";
-			src: url("{{ url_for('math.static', filename='fonts/HaranoAjiMincho-Regular.otf') }}") format("opentype");
+			src: url("{{ url_for('math.serve_fonts', font='HaranoAjiMincho-Regular.otf') }}") format("opentype");
+			font-display: swap;
 		}
 
 		.math-font {
