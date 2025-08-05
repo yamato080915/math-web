@@ -19,7 +19,7 @@
 			<div class="mb-3" style="max-width: 1180px;margin: 0 auto;">
 				<h5>問題文</h5>
 				<div class="card" style="max-width: 1000px;margin: 0 auto;">
-					<div class="card-body">
+					<div class="card-body math-font">
 						{{ math_format(data["content"]) | replace("\r\n", "<br>") | safe }}
 					</div>
 				</div>
@@ -48,7 +48,7 @@
 						</button>
 					</h2>
 					<div class="accordion-collapse collapse" id="explanation-accordion-body">
-						<div class="accordion-body">
+						<div class="accordion-body math-font">
 							{{ math_format(data["explanation"]) | replace("\r\n", "<br>") | safe }}
 						</div>
 					</div>
@@ -81,7 +81,9 @@
 									<div class="accordion-collapse collapse" id="collapse{{ i['id'] | string }}">
 										<div class="accordion-body">
 											<h6>答案</h6>
-											{{ math_format(i["content"]) | replace("\r\n", "<br>") | safe }}
+											<div class="math-font">
+												{{ math_format(i["content"]) | replace("\r\n", "<br>") | safe }}
+											</div>
 											{% if not(i["judged"]) %}
 											<div class="container" style="max-width: 500px;">
 												<form method="post">
@@ -158,7 +160,9 @@
 											<div class="accordion-collapse collapse" id="collapse{{ i['id'] | string }}">
 												<div class="accordion-body">
 													<h6>答案</h6>
-													{{ math_format(i["content"]) | replace("\r\n", "<br>") | safe }}
+													<div class="math-font">
+														{{ math_format(i["content"]) | replace("\r\n", "<br>") | safe }}
+													</div>
 													<hr>
 													<h6>得点</h6>
 													<p>
@@ -187,7 +191,7 @@
 											</div>
 											<div class="mb-3">
 												<label for="re-preview" class="form-label">問題文プレビュー</label>
-												<div id="re-preview" class="border rounded bg-white p-3" style="min-height: 120px;">{{ math_format(submissions["my_answer"]["content"]) | replace("\r\n", "<br>") | safe }}</div>
+												<div id="re-preview" class="border rounded bg-white p-3 math-font" style="min-height: 120px;">{{ math_format(submissions["my_answer"]["content"]) | replace("\r\n", "<br>") | safe }}</div>
 											</div>
 											<div class="d-grid">
 												<button type="submit" class="btn btn-primary mb-3">提出</button>

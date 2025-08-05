@@ -13,7 +13,7 @@
 				<div class="mb-3">
 					<label for="preview" class="form-label">問題文プレビュー</label>
 					<div style="max-width: 1180px;margin: 0 auto;">
-						<div id="preview" class="border rounded bg-white p-3" style="min-height: 120px;max-width: 1180px;margin: 0 auto;">{{ math_format(data['content']) | replace("\r\n", "<br>") | safe }}</div>
+						<div id="preview" class="border rounded bg-white p-3 math-font" style="min-height: 120px;max-width: 1180px;margin: 0 auto;">{{ math_format(data['content']) | replace("\r\n", "<br>") | safe }}</div>
 					</div>
 				</div><!--PREVIEW-->
 				<div class="mb-3">
@@ -23,7 +23,7 @@
 				<div class="mb-3">
 					<label for="preview2" class="form-label">解答解説プレビュー</label>
 					<div style="max-width: 1180px;margin: 0 auto;">
-						<div id="preview2" class="border rounded bg-white p-3" style="min-height: 120px;max-width: 1180px;margin: 0 auto;">{{ math_format(data['explanation']) | replace("\r\n", "<br>") | safe }}</div>
+						<div id="preview2" class="border rounded bg-white p-3 math-font" style="min-height: 120px;max-width: 1180px;margin: 0 auto;">{{ math_format(data['explanation']) | replace("\r\n", "<br>") | safe }}</div>
 					</div>
 				</div><!--PREVIEW2-->
 				<div class="mb-3">
