@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<title>画像処理中</title>
+</head>
+<body>
+	<h1>画像処理中</h1>
+	<p>
+		画像を処理しています。しばらくお待ちください。<br>完了次第自動でリダイレクトします。
+	</p>
+	<script>
+		function checkProcessingStatus() {
+			fetch(window.location.href, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-Requested-With': 'XMLHttpRequest'
+				},
+				body: JSON.stringify({
+					path: '{{ path }}',
+					check: true
+				})
+			})
+			.then(response => response.json())
+			.then(data => {
+				if (data.completed) {
+					window.location.href = "{{ url_for('math.post') }}" + "?path=" + data.path;
+				} else {
+					setTimeout(checkProcessingStatus, 5000);
+				}
+			})
+			.catch(error => {
+				console.error('エラーが発生しました:', error);
+			});
+		}
+		
+		// ページ読み込み後に処理状態の確認を開始
+		window.onload = function() {
+			setTimeout(checkProcessingStatus, 3000);
+		};
+	</script>
+</body>
+</html>

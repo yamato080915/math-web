@@ -1,11 +1,15 @@
-from flask import Blueprint, render_template, request, redirect, jsonify, abort, flash, make_response
+from flask import Blueprint, render_template, request, redirect, jsonify, abort, flash, make_response, session
 from myfunc import url_for, get_username
 from flask_login import login_required, current_user
+from werkzeug.utils import secure_filename
 
 from models import User, MathProblems, Submissions
 from app import db, app
 
 from random import randint
+import os, threading
+
+from . import mathjax
 
 def math_format(text):
 	return text.replace("[終]", '<p style="text-align: right; padding-right: 10%;">(終)</p>')
@@ -87,8 +91,15 @@ def problemsAll():
 @math.route("/problems/post", methods=["GET", "POST"])
 @login_required
 def post():
+	data = ""
+	if "problem" in session and session["problem"][0]==request.args["path"]:
+		with open(f"{request.args["path"]}.txt", "r", encoding="utf-8") as f:
+			data = f.read()
+		os.remove(session["problem"][0])
+		os.remove(f"{session["problem"][0]}.txt")
+		session["problem"] = []
 	if request.method == "GET":
-		return render_template("math/problems/post.html")
+		return render_template("math/problems/post.html", data=data)
 	else:
 		try:
 			score = list(map(int, request.form["score"].split("\r\n")))
@@ -102,6 +113,39 @@ def post():
 			db.session.commit()
 		p = get_problems(user=int(current_user.get_id()), content=request.form["content"])[0]
 		return redirect(url_for("math.problem", id=p.id))
+
+@math.route("/problems/post/image", methods=["GET", "POST"])
+@login_required
+def post_image():
+	if request.method == "GET":
+		return render_template("math/problems/image.html")
+	else:
+		file = request.files['example']
+		if "." in file.filename and "image" in file.content_type:
+			filename = secure_filename(file.filename)
+			file.save(f"controllers/math/uploads/{filename}")
+			session["problem"] = [f"controllers/math/uploads/{filename}", ""]
+			threading.Thread(target=lambda: mathjax.main(f"controllers/math/uploads/{filename}")).start()
+			return redirect(url_for("math.processing", path=session["problem"][0]))
+		else:
+			abort(400, "Invalid file format. Please upload a PNG or JPEG image.")
+
+@math.route("/problems/post/image/processing", methods=["GET", "POST"])
+def processing():
+	if request.method == "GET":
+		return render_template("math/problems/processing.html", path=request.args.get("path", ""))
+	else:
+		data = request.get_json()
+		if data and "check" in data and data["check"]:
+			completed = False
+			if os.path.isfile(f"{data["path"]}.txt"):
+				completed = True
+			
+			return jsonify({
+				"completed": completed,
+				"path": session.get("problem", ["", ""])[0]
+			})
+		return jsonify({"error": "Invalid request"})
 
 @math.route("/problems/problem/<id>", methods=["GET", "POST"])
 def problem(id):

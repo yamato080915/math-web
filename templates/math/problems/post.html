@@ -45,12 +45,15 @@
 					</div>
 				</div><!--PREVIEW-->
 				<div class="mb-3">
-					<label for="content" class="form-label">問題文(LaTeX対応)</label>
+					<div class="row">
+						<div class="col"><label for="content" class="form-label">問題文(LaTeX対応)</label></div>
+						<div class="col text-end"><a href="{{ url_for('math.post_image') }}" class="btn btn-primary">画像から問題文を生成</a></div>
+					</div>
 					<textarea name="content" id="content" class="form-control" rows="6" required placeholder="\(\text{sample}\)
 2次方程式\(\ ax^2+bx+c=0\ (a\neq 0)\ \)の解は\[\ x=\frac{-b\pm\sqrt{b^2-4ac}}{2a} \ \]である。
 \[
 \int_{-\infty}^{\infty} e^{-x^2} \, dx = \sqrt{\pi}
-\]"></textarea>
+\]">{% if data!="" %}{{data}}{% endif %}</textarea>
 				</div><!--CONTENT-->
 				<div class="mb-3">
 					<label for="preview2" class="form-label">解答解説プレビュー</label>
@@ -158,9 +161,14 @@
 			unitSelect.appendChild(option);
 		});
 	});
-	
-	const latexCode = "\\(\\text{sample}\\)\n2次方程式\\(\\ ax^2+bx+c=0\\ (a\\neq 0)\\ \\)の解は\\[\\ x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a} \\ \\]である。\\[\\int_{-\\infty}^{\\infty} e^{-x^2} \\, dx = \\sqrt{\\pi}\\]";
-	mathjaxupdate(preview, latexCode);
+
+	data = "{{ data | replace('\n', '\\n') |safe }}"
+	if (data == "") {
+		const latexCode = "\\(\\text{sample}\\)\n2次方程式\\(\\ ax^2+bx+c=0\\ (a\\neq 0)\\ \\)の解は\\[\\ x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a} \\ \\]である。\\[\\int_{-\\infty}^{\\infty} e^{-x^2} \\, dx = \\sqrt{\\pi}\\]";
+		mathjaxupdate(preview, latexCode);
+	} else {
+		mathjaxupdate(preview, content.value);
+	};
 
 </script>
 {% endblock %}
