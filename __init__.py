@@ -92,12 +92,11 @@ def problemsAll():
 @login_required
 def post():
 	data = ""
-	if "problem" in session and session["problem"][0]==request.args["path"]:
-		with open(f"{request.args["path"]}.txt", "r", encoding="utf-8") as f:
-			data = f.read()
-		os.remove(session["problem"][0])
-		os.remove(f"{session["problem"][0]}.txt")
-		session["problem"] = []
+	if "problem" in session and "path" in request.args and session["problem"]==request.args["path"]:
+		data = session["problem_data"]
+		os.remove(session["problem"])
+	session["problem"] = ""
+	session["problem_data"] = ""
 	if request.method == "GET":
 		return render_template("math/problems/post.html", data=data)
 	else:
@@ -124,28 +123,29 @@ def post_image():
 		if "." in file.filename and "image" in file.content_type:
 			filename = secure_filename(file.filename)
 			file.save(f"controllers/math/uploads/{filename}")
-			session["problem"] = [f"controllers/math/uploads/{filename}", ""]
-			threading.Thread(target=lambda: mathjax.main(f"controllers/math/uploads/{filename}")).start()
-			return redirect(url_for("math.processing", path=session["problem"][0]))
+			session["problem"] = f"controllers/math/uploads/{filename}"
+			return redirect(url_for("math.processing", path=session["problem"]))
 		else:
 			abort(400, "Invalid file format. Please upload a PNG or JPEG image.")
 
 @math.route("/problems/post/image/processing", methods=["GET", "POST"])
 def processing():
 	if request.method == "GET":
+		if not "path" in request.args:abort(400, "No image path provided.")
 		return render_template("math/problems/processing.html", path=request.args.get("path", ""))
 	else:
 		data = request.get_json()
-		if data and "check" in data and data["check"]:
-			completed = False
-			if os.path.isfile(f"{data["path"]}.txt"):
-				completed = True
-			
-			return jsonify({
-				"completed": completed,
-				"path": session.get("problem", ["", ""])[0]
-			})
-		return jsonify({"error": "Invalid request"})
+		if session["problem"] == data["path"]:
+			session["problem_data"] = mathjax.main(data['path'])
+			return jsonify({"success": True})
+		else:
+			return jsonify({"success": False})
+
+@math.route("/problems/post/processing", methods=["POST"])
+def post_processing():
+	data = request.get_json()
+	return jsonify({"success": True, "data": mathjax.solve(data["problem"])})
+	
 
 @math.route("/problems/problem/<id>", methods=["GET", "POST"])
 def problem(id):

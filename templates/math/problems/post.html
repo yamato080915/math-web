@@ -62,7 +62,10 @@
 					</div>
 				</div><!--PREVIEW2-->
 				<div class="mb-3">
-					<label for="explanation" class="form-label">解答解説(任意)</label>
+					<div class="row">
+						<div class="col"><label for="explanation" class="form-label">解答解説(任意)</label></div>
+						<div class="col text-end"><button type="button" id="generateExplanationBtn" class="btn btn-primary">解答解説を自動生成</button></div>
+					</div>
 					<textarea name="explanation" id="explanation" class="form-control" rows="6"></textarea>
 				</div><!--EXPLANATION-->
 				<div class="mb-3">
@@ -169,6 +172,55 @@
 	} else {
 		mathjaxupdate(preview, content.value);
 	};
+
+	const generateExplanationBtn = document.getElementById("generateExplanationBtn");
+	const explanationTextarea = document.getElementById("explanation");
+	
+	generateExplanationBtn.addEventListener("click", () => {
+		generateExplanationBtn.disabled = true;
+		generateExplanationBtn.textContent = "処理中...";
+		
+		const problemContent = document.getElementById("content").value;
+		
+		if (!problemContent) {
+			alert("問題文を入力してから解答解説を生成してください。");
+			generateExplanationBtn.disabled = false;
+			generateExplanationBtn.textContent = "解答解説を自動生成";
+			return;
+		}
+		
+		fetch('{{ url_for("math.post_processing") }}', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-Requested-With': 'XMLHttpRequest'
+			},
+			body: JSON.stringify({
+				problem: problemContent
+			})
+		})
+		.then(response => {
+			if (!response.ok) {
+				throw new Error('サーバーエラーが発生しました');
+			}
+			return response.json();
+		})
+		.then(data => {
+			explanationTextarea.value = data.data;
+			
+			mathjaxupdate(document.getElementById("preview2"), data.data);
+			
+			generateExplanationBtn.disabled = false;
+			generateExplanationBtn.textContent = "解答解説を自動生成";
+		})
+		.catch(error => {
+			console.error('エラーが発生しました:', error);
+			alert('処理中にエラーが発生しました。もう一度お試しください。');
+			
+			generateExplanationBtn.disabled = false;
+			generateExplanationBtn.textContent = "解答解説を自動生成";
+		});
+	});
 
 </script>
 {% endblock %}
