@@ -145,7 +145,6 @@ def processing():
 def post_processing():
 	data = request.get_json()
 	return jsonify({"success": True, "data": mathjax.solve(data["problem"])})
-	
 
 @math.route("/problems/problem/<id>", methods=["GET", "POST"])
 def problem(id):

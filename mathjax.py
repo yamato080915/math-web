@@ -25,13 +25,11 @@ def main(path):
 
 def solve(problem):
 	res = client.chat.completions.create(
-		model="deepseek/deepseek-r1-0528:free",
-		messages=[{"role": "user", "content": [
-			{"type": "text", "text": problem},
-			{"type": "text", "text": 
-"問題を解いて、過程を含めて解答をmathjax形式で出力してください。" + prompt + """証明終を示す場合は、'[終]'を使用してください。
+		model="deepseek/deepseek-r1:free",
+		messages=[{"role": "user", "content": f"問題: ```{problem}```" + """
+問題を解いて、過程を含めて解答をmathjax形式で出力してください。""" + prompt + """証明終を示す場合は、'[終]'を使用してください。
 また、ほかの情報は一切出力しないでください。出力はコードブロックで囲まないでください。
-"""}
-		]}]
+"""}]
 	)
+	print(res.choices[0].message.content, type(res.choices[0].message.content))
 	return str(res.choices[0].message.content)
