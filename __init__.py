@@ -91,14 +91,8 @@ def problemsAll():
 @math.route("/problems/post", methods=["GET", "POST"])
 @login_required
 def post():
-	data = ""
-	if "problem" in session and "path" in request.args and session["problem"]==request.args["path"]:
-		data = session["problem_data"]
-		os.remove(session["problem"])
-	session["problem"] = ""
-	session["problem_data"] = ""
 	if request.method == "GET":
-		return render_template("math/problems/post.html", data=data)
+		return render_template("math/problems/post.html")
 	else:
 		try:
 			score = list(map(int, request.form["score"].split("\r\n")))
@@ -113,33 +107,46 @@ def post():
 		p = get_problems(user=int(current_user.get_id()), content=request.form["content"])[0]
 		return redirect(url_for("math.problem", id=p.id))
 
-@math.route("/problems/post/image", methods=["GET", "POST"])
-@login_required
-def post_image():
-	if request.method == "GET":
-		return render_template("math/problems/image.html")
-	else:
-		file = request.files['example']
-		if "." in file.filename and "image" in file.content_type:
-			filename = secure_filename(file.filename)
-			file.save(f"controllers/math/uploads/{filename}")
-			session["problem"] = f"controllers/math/uploads/{filename}"
-			return redirect(url_for("math.processing", path=session["problem"]))
-		else:
-			abort(400, "Invalid file format. Please upload a PNG or JPEG image.")
-
 @math.route("/problems/post/image/processing", methods=["GET", "POST"])
 def processing():
 	if request.method == "GET":
 		if not "path" in request.args:abort(400, "No image path provided.")
 		return render_template("math/problems/processing.html", path=request.args.get("path", ""))
 	else:
-		data = request.get_json()
-		if session["problem"] == data["path"]:
-			session["problem_data"] = mathjax.main(data['path'])
-			return jsonify({"success": True})
-		else:
-			return jsonify({"success": False})
+		try:
+			# ファイルが送信されたかチェック
+			if 'image' not in request.files:
+				return jsonify({"success": False, "data": "ファイルがアップロードされていません。"})
+			
+			file = request.files['image']
+			
+			# ファイル名が空でないかチェック
+			if file.filename == '':
+				return jsonify({"success": False, "data": "ファイルが選択されていません。"})
+			
+			# 一時ファイルとして保存
+			import os
+			from werkzeug.utils import secure_filename
+			import tempfile
+			
+			temp_dir = tempfile.gettempdir()
+			filename = secure_filename(file.filename)
+			filepath = os.path.join(temp_dir, filename)
+			file.save(filepath)
+			
+			# 画像をmathjaxで処理
+			res = mathjax.main(filepath)
+			
+			# 一時ファイルを削除
+			try:
+				os.remove(filepath)
+			except:
+				pass
+				
+			return jsonify({"success": True, "data": res})
+		except Exception as e:
+			app.logger.error(f"Image processing error: {str(e)}")
+			return jsonify({"success": False, "data": "画像の処理中にエラーが発生しました。"})
 
 @math.route("/problems/post/processing", methods=["POST"])
 def post_processing():

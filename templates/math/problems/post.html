@@ -47,7 +47,7 @@
 				<div class="mb-3">
 					<div class="row">
 						<div class="col"><label for="content" class="form-label">問題文(LaTeX対応)</label></div>
-						<div class="col text-end"><a href="{{ url_for('math.post_image') }}" class="btn btn-primary">画像から問題文を生成</a></div>
+						<div class="col text-end"><button type="button" id="generateProblemBtn" class="btn btn-primary">画像から問題文を生成</button></div>
 					</div>
 					<textarea name="content" id="content" class="form-control" rows="6" required placeholder="\(\text{sample}\)
 2次方程式\(\ ax^2+bx+c=0\ (a\neq 0)\ \)の解は\[\ x=\frac{-b\pm\sqrt{b^2-4ac}}{2a} \ \]である。
@@ -173,6 +173,70 @@
 		mathjaxupdate(preview, content.value);
 	};
 
+	const generateProblemBtn = document.getElementById("generateProblemBtn");
+	const contentTextarea = document.getElementById("content");
+
+	generateProblemBtn.addEventListener("click", () => {
+		console.log("画像から問題文を生成ボタンがクリックされました");
+		generateProblemBtn.disabled = true;
+		generateProblemBtn.textContent = "処理中...";
+
+		const fileInput = document.createElement('input');
+		fileInput.type = 'file';
+		fileInput.accept = 'image/*';
+		
+		window.addEventListener('focus', function focusHandler() {
+			setTimeout(() => {
+				if (!fileInput.files || fileInput.files.length === 0) {
+					generateProblemBtn.disabled = false;
+					generateProblemBtn.textContent = "画像から問題文を生成";
+				}
+				window.removeEventListener('focus', focusHandler);
+			}, 300);
+		});
+		
+		fileInput.addEventListener('change', (event) => {
+			if (event.target.files && event.target.files[0]) {
+				const selectedFile = event.target.files[0];
+				const formData = new FormData();
+				formData.append('image', selectedFile);
+				
+				fetch("{{ url_for('math.processing') }}", {
+					method: 'POST',
+					body: formData
+				})
+				.then(response => {
+					if (!response.ok) {
+						throw new Error('サーバーエラーが発生しました');
+					};
+					return response.json();
+				})
+				.then(data => {
+					if (data.success) {
+						contentTextarea.value = data.data;
+						mathjaxupdate(preview, data.data);
+					} else {
+						alert('画像の処理中にエラーが発生しました。もう一度お試しください。');
+					};
+					generateProblemBtn.disabled = false;
+					generateProblemBtn.textContent = "画像から問題文を生成";
+				})
+				.catch(error => {
+					console.error('エラーが発生しました:', error);
+					alert('処理中にエラーが発生しました。もう一度お試しください。');
+					generateProblemBtn.disabled = false;
+					generateProblemBtn.textContent = "画像から問題文を生成";
+				});
+			} else {
+				generateProblemBtn.disabled = false;
+				generateProblemBtn.textContent = "画像から問題文を生成";
+			}
+		});
+		
+		fileInput.click();
+	});
+
+	/*
 	const generateExplanationBtn = document.getElementById("generateExplanationBtn");
 	const explanationTextarea = document.getElementById("explanation");
 	
@@ -221,6 +285,6 @@
 			generateExplanationBtn.textContent = "解答解説を自動生成";
 		});
 	});
-
+	*/
 </script>
 {% endblock %}
