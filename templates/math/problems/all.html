@@ -2,21 +2,59 @@
 {% block title %}Math Problems{% endblock %}
 {% block content %}
 <div class="container mt-5">
-	<h1>Problems</h1>
-	<div class="list-group my-5">
-		{% for i in data %}
-			<a href="{{ url_for('math.problem', id=i['id']) }}" class="list-group-item list-group-item-action">
-				<div class="row">
-					<div class="col">{{ i["title"] }}</div>
-					<div class="col text-center">
-						{{ i["category"] }}・{{ i["unit"] }}
-					</div>
-					<div class="col text-end">
-						作成者：{{ i["user"] }}
-					</div>
-				</div>
-			</a>
-		{% endfor %}
-	</div>
+    <h1 class="page-title mb-4">All Problems</h1>
+    
+    <div class="list-group my-5">
+        {% for i in data %}
+            <a href="{{ url_for('math.problem', id=i['id']) }}" class="list-group-item list-group-item-action problem-item">
+                <div class="row">
+                    <div class="col">{{ i["title"] }}</div>
+                    <div class="col text-center">
+                        {{ i["category"] }}・{{ i["unit"] }}
+                    </div>
+                    <div class="col text-end">
+                        作成者：{{ i["user"] }}
+                    </div>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+    
+    <div class="text-center my-5">
+        <a href="{{ url_for('math.problems') }}" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left"></i> 問題一覧に戻る
+        </a>
+    </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // タイトルアニメーション
+        gsap.from('.page-title', {
+            opacity: 0,
+            y: -20,
+            duration: 0.8,
+            ease: 'power3.out'
+        });
+        
+        // リストアイテムのアニメーション
+        gsap.from('.problem-item', {
+            opacity: 0,
+            y: 30,
+            duration: 0.8,
+            stagger: 0.05,
+            ease: 'power3.out',
+            delay: 0.3
+        });
+        
+        // 戻るボタンのアニメーション
+        gsap.from('.btn-outline-primary', {
+            opacity: 0,
+            y: 20,
+            duration: 0.8,
+            ease: 'power3.out',
+            delay: 0.6
+        });
+    });
+</script>
 {% endblock %}
