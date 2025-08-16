@@ -57,35 +57,59 @@
     
     <div class="container my-4 random-section">
         <h4 class="section-title">ランダム問題</h4>
-        <a href="{{ url_for('math.problem', id=data['random']['id']) }}" class="list-group-item list-group-item-action custom-list-item">
-            <div class="row">
-                <div class="col">{{ data['random']["title"] }}</div>
-                <div class="col text-center">
-                    {{ data['random']["category"] }}・{{ data['random']["unit"] }}
-                </div>
-                <div class="col text-end">
-                    作成者：{{ data['random']["user"] }}
+        <div class="card shadow-sm border-0 rounded-lg mb-3">
+            <div class="card-body">
+                <h5 class="card-title mb-3">
+                    <a href="{{ url_for('math.problem', id=data['random']['id']) }}" class="text-decoration-none text-primary stretched-link">
+                        {{ data['random']["title"] }}
+                    </a>
+                </h5>
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <p class="mb-0">
+                            <span class="badge bg-primary me-2">カテゴリ</span>
+                            {{ data['random']["category"] }}・{{ data['random']["unit"] }}
+                        </p>
+                    </div>
+                    <div class="col-md-6 text-md-end mt-2 mt-md-0">
+                        <p class="mb-0">
+                            <span class="badge bg-secondary me-2">投稿者</span>
+                            {{ data['random']["user"] }}
+                        </p>
+                    </div>
                 </div>
             </div>
-        </a>
+        </div>
     </div>
     
     {% if data["new"]!=[] %}
         <div class="container my-4 new-section">
             <h4 class="section-title">新規</h4>
-            <div class="list-group custom-list-group">
+            <div class="problem-list">
                 {% for i in data["new"] %}
-                    <a href="{{ url_for('math.problem', id=i['id']) }}" class="list-group-item list-group-item-action custom-list-item">
-                        <div class="row">
-                            <div class="col">{{ i["title"] }}</div>
-                            <div class="col text-center">
-                                {{ i["category"] }}・{{ i["unit"] }}
-                            </div>
-                            <div class="col text-end">
-                                作成者：{{ i["user"] }}
+                    <div class="card shadow-sm border-0 rounded-lg mb-3 problem-card">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">
+                                <a href="{{ url_for('math.problem', id=i['id']) }}" class="text-decoration-none text-primary stretched-link">
+                                    {{ i["title"] }}
+                                </a>
+                            </h5>
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <p class="mb-0">
+                                        <span class="badge bg-primary me-2">カテゴリ</span>
+                                        {{ i["category"] }}・{{ i["unit"] }}
+                                    </p>
+                                </div>
+                                <div class="col-md-6 text-md-end mt-2 mt-md-0">
+                                    <p class="mb-0">
+                                        <span class="badge bg-secondary me-2">投稿者</span>
+                                        {{ i["user"] }}
+                                    </p>
+                                </div>
                             </div>
                         </div>
-                    </a>
+                    </div>
                 {% endfor %}
             </div>
         </div>
@@ -93,19 +117,31 @@
     
     <div class="container my-4 my-problems-section">
         <h4 class="section-title">自分の問題</h4>
-        <div class="list-group custom-list-group">
+        <div class="problem-list">
             {% for i in data["my-problem"] %}
-                <a href="{{ url_for('math.problem', id=i['id']) }}" class="list-group-item list-group-item-action custom-list-item">
-                    <div class="row">
-                        <div class="col">{{ i["title"] }}</div>
-                        <div class="col text-center">
-                            {{ i["category"] }}・{{ i["unit"] }}
-                        </div>
-                        <div class="col text-end">
-                            作成者：{{ i["user"] }}
+                <div class="card shadow-sm border-0 rounded-lg mb-3 problem-card">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">
+                            <a href="{{ url_for('math.problem', id=i['id']) }}" class="text-decoration-none text-primary stretched-link">
+                                {{ i["title"] }}
+                            </a>
+                        </h5>
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <p class="mb-0">
+                                    <span class="badge bg-primary me-2">カテゴリ</span>
+                                    {{ i["category"] }}・{{ i["unit"] }}
+                                </p>
+                            </div>
+                            <div class="col-md-6 text-md-end mt-2 mt-md-0">
+                                <p class="mb-0">
+                                    <span class="badge bg-secondary me-2">投稿者</span>
+                                    {{ i["user"] }}
+                                </p>
+                            </div>
                         </div>
                     </div>
-                </a>
+                </div>
             {% endfor %}
         </div>
     </div>
@@ -210,6 +246,24 @@
         background-color: var(--accent-color);
         border-color: var(--accent-color);
     }
+    
+    .problem-card {
+        transition: all 0.3s ease;
+    }
+    
+    .problem-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+    
+    .badge {
+        font-weight: 500;
+        padding: 0.5em 0.8em;
+    }
+    
+    .card-title {
+        font-weight: 600;
+    }
 </style>
 
 <script>
@@ -282,14 +336,29 @@
                 container.innerHTML = '';
                 if (data.data.length > 0) {
                     data.data.forEach(problem => {
-                        const problemElement = document.createElement('a');
-                        problemElement.href = `{{ url_for('math.problem', id='') }}${problem.id}`;
-                        problemElement.className = 'list-group-item list-group-item-action custom-list-item';
+                        const problemElement = document.createElement('div');
+                        problemElement.className = 'card shadow-sm border-0 rounded-lg mb-3 problem-card';
                         problemElement.innerHTML = `
-                            <div class="row">
-                                <div class="col">${problem.title}</div>
-                                <div class="col text-center">${problem.category}・${problem.unit}</div>
-                                <div class="col text-end">作成者：${problem.user}</div>
+                            <div class="card-body">
+                                <h5 class="card-title mb-3">
+                                    <a href="{{ url_for('math.problem', id='') }}${problem.id}" class="text-decoration-none text-primary stretched-link">
+                                        ${problem.title}
+                                    </a>
+                                </h5>
+                                <div class="row align-items-center">
+                                    <div class="col-md-6">
+                                        <p class="mb-0">
+                                            <span class="badge bg-primary me-2">カテゴリ</span>
+                                            ${problem.category}・${problem.unit}
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6 text-md-end mt-2 mt-md-0">
+                                        <p class="mb-0">
+                                            <span class="badge bg-secondary me-2">投稿者</span>
+                                            ${problem.user}
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                         `;
                         container.appendChild(problemElement);

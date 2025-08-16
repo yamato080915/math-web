@@ -1,22 +1,38 @@
 {% extends "math/layout.html" %}
 {% block title %}Math Problems{% endblock %}
 {% block content %}
-<div class="container mt-5">
-    <h1 class="page-title mb-4">All Problems</h1>
+<div class="container my-5">
+    <div class="row align-items-center mb-4">
+        <div class="col">
+            <h1 class="page-title">All Problems</h1>
+        </div>
+    </div>
     
-    <div class="list-group my-5">
+    <div class="problem-list my-4">
         {% for i in data %}
-            <a href="{{ url_for('math.problem', id=i['id']) }}" class="list-group-item list-group-item-action problem-item">
-                <div class="row">
-                    <div class="col">{{ i["title"] }}</div>
-                    <div class="col text-center">
-                        {{ i["category"] }}・{{ i["unit"] }}
-                    </div>
-                    <div class="col text-end">
-                        作成者：{{ i["user"] }}
+            <div class="card shadow-sm border-0 rounded-lg mb-3 problem-card">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <a href="{{ url_for('math.problem', id=i['id']) }}" class="text-decoration-none text-primary stretched-link">
+                            {{ i["title"] }}
+                        </a>
+                    </h5>
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <p class="mb-0">
+                                <span class="badge bg-primary me-2">カテゴリ</span>
+                                {{ i["category"] }}・{{ i["unit"] }}
+                            </p>
+                        </div>
+                        <div class="col-md-6 text-md-end mt-2 mt-md-0">
+                            <p class="mb-0">
+                                <span class="badge bg-secondary me-2">投稿者</span>
+                                {{ i["user"] }}
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </a>
+            </div>
         {% endfor %}
     </div>
     
@@ -27,6 +43,47 @@
     </div>
 </div>
 
+<style>
+    .page-title {
+        color: var(--primary-color);
+        font-weight: 600;
+        border-bottom: 2px solid var(--accent-color);
+        padding-bottom: 10px;
+        display: inline-block;
+    }
+    
+    .problem-card {
+        transition: all 0.3s ease;
+    }
+    
+    .problem-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+    
+    .badge {
+        font-weight: 500;
+        padding: 0.5em 0.8em;
+    }
+    
+    .card-title {
+        font-weight: 600;
+    }
+    
+    .btn-outline-primary {
+        color: var(--accent-color);
+        border-color: var(--accent-color);
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline-primary:hover {
+        background-color: var(--accent-color);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(108, 99, 255, 0.2);
+    }
+</style>
+
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         // タイトルアニメーション
@@ -35,16 +92,6 @@
             y: -20,
             duration: 0.8,
             ease: 'power3.out'
-        });
-        
-        // リストアイテムのアニメーション
-        gsap.from('.problem-item', {
-            opacity: 0,
-            y: 30,
-            duration: 0.8,
-            stagger: 0.05,
-            ease: 'power3.out',
-            delay: 0.3
         });
         
         // 戻るボタンのアニメーション
