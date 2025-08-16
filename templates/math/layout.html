@@ -82,6 +82,16 @@
 			transform: translateY(20px);
 		}
 		
+		.form-container {
+			background-color: white;
+			border-radius: 10px;
+			box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+			padding: 20px;
+			margin-top: 20px;
+			opacity: 0;
+			transform: translateY(20px);
+		}
+		
 		.page-title {
 			color: var(--primary-color);
 			font-weight: 600;
@@ -173,11 +183,20 @@
 			});
 			
 			// コンテンツのコンテナをアニメーション化
-			gsap.to('.container', {
+			gsap.to('.container:not(.form-container)', {
 				opacity: 1,
 				y: 0,
 				duration: 0.8,
 				stagger: 0.2,
+				ease: 'power3.out',
+				delay: 0.3
+			});
+			
+			// フォームコンテナに対して別のアニメーションを適用
+			gsap.to('.form-container', {
+				opacity: 1,
+				y: 0,
+				duration: 0.8,
 				ease: 'power3.out',
 				delay: 0.3
 			});

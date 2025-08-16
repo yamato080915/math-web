@@ -1,290 +1,362 @@
 {% extends "math/layout.html" %}
-{% block title %}post{% endblock %}
+{% block title %}問題投稿{% endblock %}
 {% block content %}
 {% with messages = get_flashed_messages() %}
 {% if messages %}
 <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h1 class="modal-title fs-5" id="errorModalLabel">エラー</h1>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-			</div>
-			<div class="modal-body">
-				<ul>
-				{% if "error.score" in messages %}
-					<li>配点が有効ではありません</li>
-				{% endif %}
-				</ul>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-			</div>
-		</div>
-	</div>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h1 class="modal-title fs-5" id="errorModalLabel">エラー</h1>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="mb-0">
+                {% if "error.score" in messages %}
+                    <li>配点が有効ではありません</li>
+                {% endif %}
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
+            </div>
+        </div>
+    </div>
 </div>
 <script>
-	const myModal = new bootstrap.Modal(document.getElementById('errorModal'));
-	myModal.show();
+    const myModal = new bootstrap.Modal(document.getElementById('errorModal'));
+    myModal.show();
 </script>
 {% endif %}
 {% endwith %}
-<div class="container my-5">
-	<div class="card shadow">
-		<div class="card-body">
-			<h1 class="card-title h3 mb-4">投稿</h1>
-			<form method="post">
-				<div class="mb-3">
-					<label for="title" class="form-label">タイトル</label>
-					<input type="text" name="title" id="title" class="form-control" required>
-				</div><!--TITLE-->
-				<div class="mb-3">
-					<label for="preview" class="form-label">問題文プレビュー</label>
-					<div style="max-width: 1180px;margin: 0 auto;">
-						<div id="preview" class="border rounded bg-white p-3 math-font" style="min-height: 120px;max-width: 1000px;margin: 0 auto;"></div>
-					</div>
-				</div><!--PREVIEW-->
-				<div class="mb-3">
-					<div class="row">
-						<div class="col"><label for="content" class="form-label">問題文(LaTeX対応)</label></div>
-						<div class="col text-end"><button type="button" id="generateProblemBtn" class="btn btn-primary">画像から問題文を生成</button></div>
-					</div>
-					<textarea name="content" id="content" class="form-control" rows="6" required placeholder="\(\text{sample}\)
+
+<div class="container my-5 form-container">
+    <div class="card shadow border-0 rounded-lg">
+        <div class="card-header bg-transparent">
+            <h1 class="card-title h3 text-primary my-3">問題投稿</h1>
+        </div>
+        <div class="card-body">
+            <form method="post" id="postForm">
+                <div class="mb-4">
+                    <label for="title" class="form-label">タイトル</label>
+                    <input type="text" name="title" id="title" class="form-control" required>
+                </div><!--TITLE-->
+                
+                <div class="mb-4">
+                    <label for="preview" class="form-label">問題文プレビュー</label>
+                    <div class="preview-container">
+                        <div id="preview" class="border rounded bg-light p-4 math-font"></div>
+                    </div>
+                </div><!--PREVIEW-->
+                
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label for="content" class="form-label mb-0">問題文(LaTeX対応)</label>
+                        <button type="button" id="generateProblemBtn" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-image"></i> 画像から問題文を生成
+                        </button>
+                    </div>
+                    <textarea name="content" id="content" class="form-control" rows="6" required placeholder="\(\text{sample}\)
 2次方程式\(\ ax^2+bx+c=0\ (a\neq 0)\ \)の解は\[\ x=\frac{-b\pm\sqrt{b^2-4ac}}{2a} \ \]である。
 \[
 \int_{-\infty}^{\infty} e^{-x^2} \, dx = \sqrt{\pi}
 \]">{% if data!="" %}{{data}}{% endif %}</textarea>
-				</div><!--CONTENT-->
-				<div class="mb-3">
-					<label for="preview2" class="form-label">解答解説プレビュー</label>
-					<div style="max-width: 1180px;margin: 0 auto;">
-						<div id="preview2" class="border rounded bg-white p-3 math-font" style="min-height: 120px;max-width: 1180px;margin: 0 auto;"></div>
-					</div>
-				</div><!--PREVIEW2-->
-				<div class="mb-3">
-					<div class="row">
-						<div class="col"><label for="explanation" class="form-label">解答解説(任意)</label></div>
-						<!--<div class="col text-end"><button type="button" id="generateExplanationBtn" class="btn btn-primary">解答解説を自動生成</button></div>-->
-					</div>
-					<textarea name="explanation" id="explanation" class="form-control" rows="6"></textarea>
-				</div><!--EXPLANATION-->
-				<div class="mb-3">
-					<label for="category" class="form-label">カテゴリ</label>
-					<select name="category" id="category" class="form-select" required>
-						<option disabled selected value="">選択してください</option>
-						<option>数学Ⅰ</option>
-						<option>数学Ａ</option>
-						<option>数学Ⅱ</option>
-						<option>数学Ｂ</option>
-						<option>数学Ⅲ</option>
-						<option>数学Ｃ</option>
-					</select>
-				</div><!--CATEGORY-->
-				<div class="mb-3">
-					<label for="unit" class="form-label">単元</label>
-					<select name="unit" id="unit" class="form-select" required>
-						<option disabled selected value="">カテゴリを選択してください</option>
-					</select>
-				</div><!--UNIT-->
-				<div class="mb-3">
-					<label for="score" class="form-label">配点(1問ずつ改行して配点を入力してください。)</label>
-					<textarea name="score" id="score" class="form-control" rows="4" placeholder="5
+                </div><!--CONTENT-->
+                
+                <div class="mb-4">
+                    <label for="preview2" class="form-label">解答解説プレビュー</label>
+                    <div class="preview-container">
+                        <div id="preview2" class="border rounded bg-light p-4 math-font"></div>
+                    </div>
+                </div><!--PREVIEW2-->
+                
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label for="explanation" class="form-label mb-0">解答解説(任意)</label>
+                        <!--<button type="button" id="generateExplanationBtn" class="btn btn-sm btn-outline-primary">解答解説を自動生成</button>-->
+                    </div>
+                    <textarea name="explanation" id="explanation" class="form-control" rows="6"></textarea>
+                </div><!--EXPLANATION-->
+                
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label for="category" class="form-label">カテゴリ</label>
+                        <select name="category" id="category" class="form-select" required>
+                            <option disabled selected value="">選択してください</option>
+                            <option>数学Ⅰ</option>
+                            <option>数学Ａ</option>
+                            <option>数学Ⅱ</option>
+                            <option>数学Ｂ</option>
+                            <option>数学Ⅲ</option>
+                            <option>数学Ｃ</option>
+                        </select>
+                    </div><!--CATEGORY-->
+                    
+                    <div class="col-md-6 mb-4">
+                        <label for="unit" class="form-label">単元</label>
+                        <select name="unit" id="unit" class="form-select" required>
+                            <option disabled selected value="">カテゴリを選択してください</option>
+                        </select>
+                    </div><!--UNIT-->
+                </div>
+                
+                <div class="mb-4">
+                    <label for="score" class="form-label">配点(1問ずつ改行して配点を入力してください。)</label>
+                    <textarea name="score" id="score" class="form-control" rows="4" placeholder="5
 5
 10
 10" required></textarea>
-				</div>
-				<div class="d-grid">
-					<button type="submit" class="btn btn-primary mb-5">投稿</button>
-				</div>
-			</form>
-			<div class="mb-3">
-				<h5>便利なコード</h5>
-				<table class="table">
-					<thead>
-						<tr>
-							<th scope="col" style="width: 10%;">意味</th>
-							<th scope="col" style="width: 10%;">コード</th>
-							<th scope="col" style="width: 80%;">表示</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td>証明終わり</td>
-							<td>[終]</td>
-							<td>
-								<div id="preview" class="border rounded bg-white p-3" style="max-width: 1000px;margin: 0 auto;">
-									<p style="text-align: right; padding-right: 10%;">(終)</p>
-								</div>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="mb-3">
-				<h5>LaTeXについて</h5>
-				"\\("と"\\)"で囲むと文章中に、"\\["と"\\]"で囲むと別行立てで数式が表示されます。
-				<h6>主なコマンド</h6>
-				詳しくは<a href="https://easy-copy-mathjax.nakaken88.com/all/" style="color: black;">こちら</a>
-				{% include "math/latex_table.html" %}
-			</div>
-		</div>
-	</div>
+                </div>
+                
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg">投稿する</button>
+                </div>
+            </form>
+            
+            <div class="mt-5 pt-3 border-top">
+                <h5 class="mb-3">便利なコード</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col" style="width: 15%;">意味</th>
+                                <th scope="col" style="width: 15%;">コード</th>
+                                <th scope="col" style="width: 70%;">表示</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>証明終わり</td>
+                                <td><code>[終]</code></td>
+                                <td>
+                                    <div class="border rounded bg-light p-3">
+                                        <p style="text-align: right; padding-right: 10%;">(終)</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <h5 class="mb-3">LaTeXについて</h5>
+                <p>"\\("と"\\)"で囲むと文章中に、"\\["と"\\]"で囲むと別行立てで数式が表示されます。</p>
+                <h6 class="mb-3">主なコマンド</h6>
+                <p>詳しくは<a href="https://easy-copy-mathjax.nakaken88.com/all/" class="text-decoration-none">こちら</a></p>
+                <div class="latex-table-container">
+                    {% include "math/latex_table.html" %}
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+    .form-container {
+        /* アニメーションが動作するように、opacity と transform は削除 */
+        padding: 30px !important;
+    }
+    
+    .preview-container {
+        max-width: 100%;
+        margin: 0 auto;
+    }
+    
+    .math-font {
+        min-height: 120px;
+        max-width: 100%;
+        margin: 0 auto;
+        background-color: #f8f9fa;
+        border: 1px solid rgba(0,0,0,0.1) !important;
+    }
+    
+    .form-control, .form-select {
+        padding: 0.75rem;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        border: 1px solid #dee2e6;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 0.2rem rgba(108, 99, 255, 0.25);
+    }
+    
+    .btn-primary {
+        background-color: var(--accent-color);
+        border-color: var(--accent-color);
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        background-color: #5651db;
+        border-color: #5651db;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(108, 99, 255, 0.2);
+    }
+    
+    .btn-outline-primary {
+        color: var(--accent-color);
+        border-color: var(--accent-color);
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline-primary:hover {
+        background-color: var(--accent-color);
+        color: white;
+    }
+    
+    .card {
+        overflow: hidden;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08) !important;
+    }
+    
+    .card-header {
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    .card-title {
+        color: var(--primary-color);
+    }
+    
+    .form-label {
+        font-weight: 500;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+    }
+    
+    .latex-table-container {
+        max-height: 500px;
+        overflow-y: auto;
+        border: 1px solid rgba(0,0,0,0.1);
+        border-radius: 6px;
+    }
+    
+    .table-responsive {
+        border-radius: 6px;
+        overflow: hidden;
+    }
+</style>
+
 {% include "math/problems/event.js.html" %}
 <script>
-	const content = document.getElementById("content");
-	const preview = document.getElementById("preview");
-	listener(content, preview);
+    document.addEventListener('DOMContentLoaded', () => {
+        // 既存のスクリプト機能
+        const content = document.getElementById("content");
+        const preview = document.getElementById("preview");
+        listener(content, preview);
 
-	const explanation = document.getElementById("explanation");
-	const preview2 = document.getElementById("preview2");
-	listener(explanation, preview2);
+        const explanation = document.getElementById("explanation");
+        const preview2 = document.getElementById("preview2");
+        listener(explanation, preview2);
 
-	const unitMap = {
-		"数学Ⅰ": ["数と式", "2次関数", "集合と命題", "図形と計量", "データの分析"],
-		"数学Ａ": ["場合の数", "確率", "図形の性質", "整数"],
-		"数学Ⅱ": ["式と計算", "高次方程式", "図形と方程式", "三角関数", "指数関数と対数関数", "微分法", "積分法"],
-		"数学Ｂ": ["数列", "確率分布と統計的な推測"],
-		"数学Ⅲ": ["極限", "微分法", "積分法"],
-		"数学Ｃ": ["平面ベクトル", "空間ベクトル", "複素数平面", "式と曲線"]
-	};
+        const unitMap = {
+            "数学Ⅰ": ["数と式", "2次関数", "集合と命題", "図形と計量", "データの分析"],
+            "数学Ａ": ["場合の数", "確率", "図形の性質", "整数"],
+            "数学Ⅱ": ["式と計算", "高次方程式", "図形と方程式", "三角関数", "指数関数と対数関数", "微分法", "積分法"],
+            "数学Ｂ": ["数列", "確率分布と統計的な推測"],
+            "数学Ⅲ": ["極限", "微分法", "積分法"],
+            "数学Ｃ": ["平面ベクトル", "空間ベクトル", "複素数平面", "式と曲線"]
+        };
 
-	const categorySelect = document.getElementById("category");
-	const unitSelect = document.getElementById("unit");
+        const categorySelect = document.getElementById("category");
+        const unitSelect = document.getElementById("unit");
 
-	categorySelect.addEventListener("change", () => {
-		const selectedCategory = categorySelect.value;
-		const units = unitMap[selectedCategory] || [];
+        categorySelect.addEventListener("change", () => {
+            const selectedCategory = categorySelect.value;
+            const units = unitMap[selectedCategory] || [];
 
-		unitSelect.innerHTML = '<option disabled selected value="">単元を選択してください</option>';
-		units.forEach(unit => {
-			const option = document.createElement("option");
-			option.value = unit;
-			option.textContent = unit;
-			unitSelect.appendChild(option);
-		});
-	});
+            unitSelect.innerHTML = '<option disabled selected value="">単元を選択してください</option>';
+            units.forEach(unit => {
+                const option = document.createElement("option");
+                option.value = unit;
+                option.textContent = unit;
+                unitSelect.appendChild(option);
+            });
+        });
 
-	data = "{{ data | replace('\n', '\\n') |safe }}"
-	if (data == "") {
-		const latexCode = "\\(\\text{sample}\\)\n2次方程式\\(\\ ax^2+bx+c=0\\ (a\\neq 0)\\ \\)の解は\\[\\ x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a} \\ \\]である。\\[\\int_{-\\infty}^{\\infty} e^{-x^2} \\, dx = \\sqrt{\\pi}\\]";
-		mathjaxupdate(preview, latexCode);
-	} else {
-		mathjaxupdate(preview, content.value);
-	};
+        // サンプルテキストの初期表示
+        data = "{{ data | replace('\n', '\\n') |safe }}"
+        if (data == "") {
+            const latexCode = "\\(\\text{sample}\\)\n2次方程式\\(\\ ax^2+bx+c=0\\ (a\\neq 0)\\ \\)の解は\\[\\ x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a} \\ \\]である。\\[\\int_{-\\infty}^{\\infty} e^{-x^2} \\, dx = \\sqrt{\\pi}\\]";
+            mathjaxupdate(preview, latexCode);
+        } else {
+            mathjaxupdate(preview, content.value);
+        };
 
-	const generateProblemBtn = document.getElementById("generateProblemBtn");
-	const contentTextarea = document.getElementById("content");
+        // 画像から問題文を生成
+        const generateProblemBtn = document.getElementById("generateProblemBtn");
+        const contentTextarea = document.getElementById("content");
 
-	generateProblemBtn.addEventListener("click", () => {
-		console.log("画像から問題文を生成ボタンがクリックされました");
-		generateProblemBtn.disabled = true;
-		generateProblemBtn.textContent = "処理中...";
+        generateProblemBtn.addEventListener("click", () => {
+            console.log("画像から問題文を生成ボタンがクリックされました");
+            generateProblemBtn.disabled = true;
+            generateProblemBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> 処理中...';
 
-		const fileInput = document.createElement('input');
-		fileInput.type = 'file';
-		fileInput.accept = 'image/*';
-		
-		window.addEventListener('focus', function focusHandler() {
-			setTimeout(() => {
-				if (!fileInput.files || fileInput.files.length === 0) {
-					generateProblemBtn.disabled = false;
-					generateProblemBtn.textContent = "画像から問題文を生成";
-				}
-				window.removeEventListener('focus', focusHandler);
-			}, 300);
-		});
-		
-		fileInput.addEventListener('change', (event) => {
-			if (event.target.files && event.target.files[0]) {
-				const selectedFile = event.target.files[0];
-				const formData = new FormData();
-				formData.append('image', selectedFile);
-				
-				fetch("{{ url_for('math.processing') }}", {
-					method: 'POST',
-					body: formData
-				})
-				.then(response => {
-					if (!response.ok) {
-						throw new Error('サーバーエラーが発生しました');
-					};
-					return response.json();
-				})
-				.then(data => {
-					if (data.success) {
-						contentTextarea.value = data.data;
-						mathjaxupdate(preview, data.data);
-					} else {
-						alert('画像の処理中にエラーが発生しました。もう一度お試しください。');
-					};
-					generateProblemBtn.disabled = false;
-					generateProblemBtn.textContent = "画像から問題文を生成";
-				})
-				.catch(error => {
-					console.error('エラーが発生しました:', error);
-					alert('処理中にエラーが発生しました。もう一度お試しください。');
-					generateProblemBtn.disabled = false;
-					generateProblemBtn.textContent = "画像から問題文を生成";
-				});
-			} else {
-				generateProblemBtn.disabled = false;
-				generateProblemBtn.textContent = "画像から問題文を生成";
-			}
-		});
-		
-		fileInput.click();
-	});
-
-	/*
-	const generateExplanationBtn = document.getElementById("generateExplanationBtn");
-	const explanationTextarea = document.getElementById("explanation");
-	
-	generateExplanationBtn.addEventListener("click", () => {
-		generateExplanationBtn.disabled = true;
-		generateExplanationBtn.textContent = "処理中...";
-		
-		const problemContent = document.getElementById("content").value;
-		
-		if (!problemContent) {
-			alert("問題文を入力してから解答解説を生成してください。");
-			generateExplanationBtn.disabled = false;
-			generateExplanationBtn.textContent = "解答解説を自動生成";
-			return;
-		}
-		
-		fetch('{{ url_for("math.post_processing") }}', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'X-Requested-With': 'XMLHttpRequest'
-			},
-			body: JSON.stringify({
-				problem: problemContent
-			})
-		})
-		.then(response => {
-			if (!response.ok) {
-				throw new Error('サーバーエラーが発生しました');
-			}
-			return response.json();
-		})
-		.then(data => {
-			explanationTextarea.value = data.data;
-			
-			mathjaxupdate(document.getElementById("preview2"), data.data);
-			
-			generateExplanationBtn.disabled = false;
-			generateExplanationBtn.textContent = "解答解説を自動生成";
-		})
-		.catch(error => {
-			console.error('エラーが発生しました:', error);
-			alert('処理中にエラーが発生しました。もう一度お試しください。');
-			
-			generateExplanationBtn.disabled = false;
-			generateExplanationBtn.textContent = "解答解説を自動生成";
-		});
-	});
-	*/
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/*';
+            
+            window.addEventListener('focus', function focusHandler() {
+                setTimeout(() => {
+                    if (!fileInput.files || fileInput.files.length === 0) {
+                        generateProblemBtn.disabled = false;
+                        generateProblemBtn.innerHTML = '<i class="bi bi-image"></i> 画像から問題文を生成';
+                    }
+                    window.removeEventListener('focus', focusHandler);
+                }, 300);
+            });
+            
+            fileInput.addEventListener('change', (event) => {
+                if (event.target.files && event.target.files[0]) {
+                    const selectedFile = event.target.files[0];
+                    const formData = new FormData();
+                    formData.append('image', selectedFile);
+                    
+                    fetch("{{ url_for('math.processing') }}", {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('サーバーエラーが発生しました');
+                        };
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            contentTextarea.value = data.data;
+                            mathjaxupdate(preview, data.data);
+                            
+                            // アニメーション効果を追加
+                            gsap.fromTo(preview, 
+                                { backgroundColor: "rgba(108, 99, 255, 0.1)" },
+                                { backgroundColor: "#f8f9fa", duration: 1.5, ease: "power2.out" }
+                            );
+                        } else {
+                            alert('画像の処理中にエラーが発生しました。もう一度お試しください。');
+                        };
+                        generateProblemBtn.disabled = false;
+                        generateProblemBtn.innerHTML = '<i class="bi bi-image"></i> 画像から問題文を生成';
+                    })
+                    .catch(error => {
+                        console.error('エラーが発生しました:', error);
+                        alert('処理中にエラーが発生しました。もう一度お試しください。');
+                        generateProblemBtn.disabled = false;
+                        generateProblemBtn.innerHTML = '<i class="bi bi-image"></i> 画像から問題文を生成';
+                    });
+                } else {
+                    generateProblemBtn.disabled = false;
+                    generateProblemBtn.innerHTML = '<i class="bi bi-image"></i> 画像から問題文を生成';
+                }
+            });
+            
+            fileInput.click();
+        });
+    });
 </script>
 {% endblock %}

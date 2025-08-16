@@ -107,46 +107,39 @@ def post():
 		p = get_problems(user=int(current_user.get_id()), content=request.form["content"])[0]
 		return redirect(url_for("math.problem", id=p.id))
 
-@math.route("/problems/post/image/processing", methods=["GET", "POST"])
+@math.route("/problems/post/image/processing", methods=["POST"])
 def processing():
-	if request.method == "GET":
-		if not "path" in request.args:abort(400, "No image path provided.")
-		return render_template("math/problems/processing.html", path=request.args.get("path", ""))
-	else:
+	try:
+		if 'image' not in request.files:
+			return jsonify({"success": False, "data": "ファイルがアップロードされていません。"})
+		
+		file = request.files['image']
+		
+		if file.filename == '':
+			return jsonify({"success": False, "data": "ファイルが選択されていません。"})
+		
+		import os
+		from werkzeug.utils import secure_filename
+		import tempfile
+		
+		temp_dir = tempfile.gettempdir()
+		filename = secure_filename(file.filename)
+		filepath = os.path.join(temp_dir, filename)
+		file.save(filepath)
+		
+		# 画像をmathjaxで処理
+		res = mathjax.main(filepath)
+		
+		# 一時ファイルを削除
 		try:
-			# ファイルが送信されたかチェック
-			if 'image' not in request.files:
-				return jsonify({"success": False, "data": "ファイルがアップロードされていません。"})
+			os.remove(filepath)
+		except:
+			pass
 			
-			file = request.files['image']
-			
-			# ファイル名が空でないかチェック
-			if file.filename == '':
-				return jsonify({"success": False, "data": "ファイルが選択されていません。"})
-			
-			# 一時ファイルとして保存
-			import os
-			from werkzeug.utils import secure_filename
-			import tempfile
-			
-			temp_dir = tempfile.gettempdir()
-			filename = secure_filename(file.filename)
-			filepath = os.path.join(temp_dir, filename)
-			file.save(filepath)
-			
-			# 画像をmathjaxで処理
-			res = mathjax.main(filepath)
-			
-			# 一時ファイルを削除
-			try:
-				os.remove(filepath)
-			except:
-				pass
-				
-			return jsonify({"success": True, "data": res})
-		except Exception as e:
-			app.logger.error(f"Image processing error: {str(e)}")
-			return jsonify({"success": False, "data": "画像の処理中にエラーが発生しました。"})
+		return jsonify({"success": True, "data": res})
+	except Exception as e:
+		app.logger.error(f"Image processing error: {str(e)}")
+		return jsonify({"success": False, "data": "画像の処理中にエラーが発生しました。"})
 
 @math.route("/problems/post/processing", methods=["POST"])
 def post_processing():
