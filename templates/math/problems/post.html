@@ -37,19 +37,19 @@
         </div>
         <div class="card-body">
             <form method="post" id="postForm">
-                <div class="mb-4">
+                <div class="mb-4 title-section">
                     <label for="title" class="form-label">タイトル</label>
                     <input type="text" name="title" id="title" class="form-control" required>
                 </div><!--TITLE-->
                 
-                <div class="mb-4">
+                <div class="mb-4 preview-section">
                     <label for="preview" class="form-label">問題文プレビュー</label>
                     <div class="preview-container">
                         <div id="preview" class="border rounded bg-light p-4 math-font"></div>
                     </div>
                 </div><!--PREVIEW-->
                 
-                <div class="mb-4">
+                <div class="mb-4 content-section">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <label for="content" class="form-label mb-0">問題文(LaTeX対応)</label>
                         <button type="button" id="generateProblemBtn" class="btn btn-sm btn-outline-primary">
@@ -63,14 +63,14 @@
 \]">{% if data!="" %}{{data}}{% endif %}</textarea>
                 </div><!--CONTENT-->
                 
-                <div class="mb-4">
+                <div class="mb-4 preview2-section">
                     <label for="preview2" class="form-label">解答解説プレビュー</label>
                     <div class="preview-container">
                         <div id="preview2" class="border rounded bg-light p-4 math-font"></div>
                     </div>
                 </div><!--PREVIEW2-->
                 
-                <div class="mb-4">
+                <div class="mb-4 explanation-section">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <label for="explanation" class="form-label mb-0">解答解説(任意)</label>
                         <!--<button type="button" id="generateExplanationBtn" class="btn btn-sm btn-outline-primary">解答解説を自動生成</button>-->
@@ -78,7 +78,7 @@
                     <textarea name="explanation" id="explanation" class="form-control" rows="6"></textarea>
                 </div><!--EXPLANATION-->
                 
-                <div class="row">
+                <div class="row category-section">
                     <div class="col-md-6 mb-4">
                         <label for="category" class="form-label">カテゴリ</label>
                         <select name="category" id="category" class="form-select" required>
@@ -100,7 +100,7 @@
                     </div><!--UNIT-->
                 </div>
                 
-                <div class="mb-4">
+                <div class="mb-4 score-section">
                     <label for="score" class="form-label">配点(1問ずつ改行して配点を入力してください。)</label>
                     <textarea name="score" id="score" class="form-control" rows="4" placeholder="5
 5
@@ -108,12 +108,12 @@
 10" required></textarea>
                 </div>
                 
-                <div class="d-grid mt-4">
+                <div class="d-grid mt-4 post-btn">
                     <button type="submit" class="btn btn-primary btn-lg">投稿する</button>
                 </div>
             </form>
             
-            <div class="mt-5 pt-3 border-top">
+            <div class="mt-5 pt-3 border-top code-section">
                 <h5 class="mb-3">便利なコード</h5>
                 <div class="table-responsive">
                     <table class="table table-bordered">
@@ -139,7 +139,7 @@
                 </div>
             </div>
             
-            <div class="mt-4">
+            <div class="mt-4 latex-section">
                 <h5 class="mb-3">LaTeXについて</h5>
                 <p>"\\("と"\\)"で囲むと文章中に、"\\["と"\\]"で囲むと別行立てで数式が表示されます。</p>
                 <h6 class="mb-3">主なコマンド</h6>
@@ -245,6 +245,32 @@
 {% include "math/problems/event.js.html" %}
 <script>
     document.addEventListener('DOMContentLoaded', () => {
+        const sections = [
+            ".title-section",
+            ".preview-section",
+            ".content-section",
+            ".preview2-section",
+            ".explanation-section",
+            ".category-section",
+            ".score-section",
+            ".post-btn",
+			".code-section",
+			".latex-section"
+        ];
+        
+        sections.forEach((section, index) => {
+            const elements = document.querySelectorAll(section);
+            if (elements.length > 0) {
+                gsap.from(elements, {
+                    opacity: 0,
+                    y: 30,
+                    duration: 0.8,
+                    ease: 'power3.out',
+                    delay: 0.3 + (index * 0.1)
+                });
+            }
+        });
+		
         // 既存のスクリプト機能
         const content = document.getElementById("content");
         const preview = document.getElementById("preview");
