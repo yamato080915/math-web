@@ -264,32 +264,65 @@
     .card-title {
         font-weight: 600;
     }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes staggerFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .category-section {
+        animation: fadeInUp 0.6s ease-out 0.1s forwards;
+        opacity: 0;
+    }
+    
+    .filtered-section {
+        animation: fadeInUp 0.6s ease-out 0.2s forwards;
+        opacity: 0;
+    }
+    
+    .random-section {
+        animation: fadeInUp 0.6s ease-out 0.3s forwards;
+        opacity: 0;
+    }
+    
+    .new-section {
+        animation: fadeInUp 0.6s ease-out 0.4s forwards;
+        opacity: 0;
+    }
+    
+    .my-problems-section {
+        animation: fadeInUp 0.6s ease-out 0.5s forwards;
+        opacity: 0;
+    }
+    
+    .problem-card {
+        animation: staggerFadeIn 0.5s ease-out forwards;
+    }
+    
+    .problem-card.newly-added {
+        animation: fadeInUp 0.4s ease-out forwards;
+    }
 </style>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // 各セクションのアニメーション
-        const sections = [
-            '.category-section', 
-            '.filtered-section', 
-            '.random-section', 
-            '.new-section', 
-            '.my-problems-section'
-        ];
-        
-        sections.forEach((section, index) => {
-            const elements = document.querySelectorAll(section);
-            if (elements.length > 0) {
-                gsap.from(elements, {
-                    opacity: 0,
-                    y: 30,
-                    duration: 0.8,
-                    ease: 'power3.out',
-                    delay: 0.3 + (index * 0.1)
-                });
-            }
-        });
-
         // チェックボックスの機能
         const selectAllCheckboxes = document.querySelectorAll('.select-all');
         selectAllCheckboxes.forEach(selectAll => {
@@ -361,15 +394,8 @@
                                 </div>
                             </div>
                         `;
+                        problemElement.classList.add('newly-added');
                         container.appendChild(problemElement);
-                        
-                        // 新しく追加された要素にアニメーション
-                        gsap.from(problemElement, {
-                            opacity: 0,
-                            y: 10,
-                            duration: 0.4,
-                            ease: 'power2.out',
-                        });
                     });
                     MathJax.typesetClear();
                     MathJax.typesetPromise([container]);

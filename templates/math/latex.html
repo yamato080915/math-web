@@ -45,6 +45,38 @@
         box-shadow: 0 5px 15px rgba(0,0,0,0.05);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
         overflow: hidden;
+        animation: fadeInUp 0.6s ease-out forwards;
+        opacity: 0;
+    }
+    
+    .editor-card {
+        animation-delay: 0.2s;
+    }
+    
+    .output-card {
+        animation-delay: 0.4s;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+        50% {
+            opacity: 0.95;
+            transform: scale(1.01);
+        }
     }
     
     .card:hover {
@@ -74,6 +106,10 @@
     #output {
         transition: all 0.3s ease;
     }
+    
+    #output.updating {
+        animation: pulse 0.4s ease-out;
+    }
 </style>
 
 <script>
@@ -86,32 +122,15 @@
             const latexCode = input.value;
             output.innerHTML = `\\[${latexCode}\\]`;
             
+            // アニメーション効果を適用
+            output.classList.add('updating');
+            setTimeout(() => {
+                output.classList.remove('updating');
+            }, 400);
+            
             // MathJaxを使用して数式をレンダリング
             MathJax.typesetClear();
             MathJax.typesetPromise();
-            
-            // アニメーション効果を適用
-            gsap.fromTo("#output", 
-                { opacity: 0.7, scale: 0.98 },
-                { opacity: 1, scale: 1, duration: 0.4, ease: "power2.out" }
-            );
-        });
-        
-        // カードのアニメーション
-        gsap.from('.editor-card', {
-            opacity: 0,
-            y: 30,
-            duration: 0.8,
-            ease: 'power3.out',
-            delay: 0.4
-        });
-        
-        gsap.from('.output-card', {
-            opacity: 0,
-            y: 30,
-            duration: 0.8,
-            ease: 'power3.out',
-            delay: 0.6
         });
     });
 </script>

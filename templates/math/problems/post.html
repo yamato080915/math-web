@@ -240,37 +240,85 @@
         border-radius: 6px;
         overflow: hidden;
     }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes highlightFlash {
+        0% {
+            background-color: rgba(108, 99, 255, 0.1);
+        }
+        100% {
+            background-color: #f8f9fa;
+        }
+    }
+    
+    .title-section {
+        animation: fadeInUp 0.5s ease-out 0.1s forwards;
+        opacity: 0;
+    }
+    
+    .preview-section {
+        animation: fadeInUp 0.5s ease-out 0.2s forwards;
+        opacity: 0;
+    }
+    
+    .content-section {
+        animation: fadeInUp 0.5s ease-out 0.3s forwards;
+        opacity: 0;
+    }
+    
+    .preview2-section {
+        animation: fadeInUp 0.5s ease-out 0.4s forwards;
+        opacity: 0;
+    }
+    
+    .explanation-section {
+        animation: fadeInUp 0.5s ease-out 0.5s forwards;
+        opacity: 0;
+    }
+    
+    .category-section {
+        animation: fadeInUp 0.5s ease-out 0.6s forwards;
+        opacity: 0;
+    }
+    
+    .score-section {
+        animation: fadeInUp 0.5s ease-out 0.7s forwards;
+        opacity: 0;
+    }
+    
+    .post-btn {
+        animation: fadeInUp 0.5s ease-out 0.8s forwards;
+        opacity: 0;
+    }
+    
+    .code-section {
+        animation: fadeInUp 0.5s ease-out 0.9s forwards;
+        opacity: 0;
+    }
+    
+    .latex-section {
+        animation: fadeInUp 0.5s ease-out 1.0s forwards;
+        opacity: 0;
+    }
+    
+    .preview-container.highlight {
+        animation: highlightFlash 1.5s ease-out forwards;
+    }
 </style>
 
 {% include "math/problems/event.js.html" %}
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const sections = [
-            ".title-section",
-            ".preview-section",
-            ".content-section",
-            ".preview2-section",
-            ".explanation-section",
-            ".category-section",
-            ".score-section",
-            ".post-btn",
-			".code-section",
-			".latex-section"
-        ];
-        
-        sections.forEach((section, index) => {
-            const elements = document.querySelectorAll(section);
-            if (elements.length > 0) {
-                gsap.from(elements, {
-                    opacity: 0,
-                    y: 30,
-                    duration: 0.8,
-                    ease: 'power3.out',
-                    delay: 0.3 + (index * 0.1)
-                });
-            }
-        });
-		
         // 既存のスクリプト機能
         const content = document.getElementById("content");
         const preview = document.getElementById("preview");
@@ -359,10 +407,10 @@
                             mathjaxupdate(preview, data.data);
                             
                             // アニメーション効果を追加
-                            gsap.fromTo(preview, 
-                                { backgroundColor: "rgba(108, 99, 255, 0.1)" },
-                                { backgroundColor: "#f8f9fa", duration: 1.5, ease: "power2.out" }
-                            );
+                            preview.classList.add('highlight');
+                            setTimeout(() => {
+                                preview.classList.remove('highlight');
+                            }, 1500);
                         } else {
                             alert('画像の処理中にエラーが発生しました。もう一度お試しください。');
                         };
