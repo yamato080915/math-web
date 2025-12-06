@@ -16,7 +16,10 @@
                         {{ data["category"] }}・{{ data["unit"] }}
                     </p>
                 </div>
-                <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                <div class="col-md-6 text-md-end mt-3 mt-md-0">                    
+                    <a href="{{ url_for('math.pdf', id=data['id']) }}" class="btn btn-primary">
+                        <i class="bi bi-pencil-square"></i> PDFで表示
+                    </a>
                     {% if current_user.id==data["userid"] %}
                     <a href="{{ url_for('math.edit', id=data['id']) }}" class="btn btn-primary">
                         <i class="bi bi-pencil-square"></i> 編集
