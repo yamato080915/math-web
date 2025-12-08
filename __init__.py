@@ -210,4 +210,14 @@ def pdf(id):
 	if p==None:
 		return abort(404)
 	else:
-		return render_template("math/problems/pdf.html", data=p)
+		return render_template("math/problems/pdf.html", title=p["title"], content=p["content"])
+
+@math.route("/problems/problem/<id>/ans_pdf")
+def ans_pdf(id):
+	p = get_problem(id)
+	if not(get_submissions(id, user=current_user.id, judged=True) or p["userid"] == current_user.id):
+		return abort(403)
+	if p==None:
+		return abort(404)
+	else:
+		return render_template("math/problems/pdf.html", title=p["title"], content=p["explanation"])

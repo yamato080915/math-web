@@ -2,385 +2,400 @@
 {% block title %}{{ data["title"] }}{% endblock %}
 {% block content %}
 <div class="container my-5 problem-container">
-    <div class="card shadow border-0 rounded-lg">
-        <div class="card-header bg-transparent">
-            <h1 class="card-title h3 text-primary my-3">{{ data["title"] }}</h1>
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <p class="mb-1">
-                        <span class="badge bg-secondary me-2">投稿者</span>
-                        {{ data["user"] }}{% if data["userid"]==1 %} <span class="badge bg-danger">admin</span>{% endif %}
-                    </p>
-                    <p class="mb-0">
-                        <span class="badge bg-primary me-2">カテゴリ</span>
-                        {{ data["category"] }}・{{ data["unit"] }}
-                    </p>
-                </div>
-                <div class="col-md-6 text-md-end mt-3 mt-md-0">                    
-                    <a href="{{ url_for('math.pdf', id=data['id']) }}" class="btn btn-primary">
-                        <i class="bi bi-pencil-square"></i> PDFで表示
-                    </a>
-                    {% if current_user.id==data["userid"] %}
-                    <a href="{{ url_for('math.edit', id=data['id']) }}" class="btn btn-primary">
-                        <i class="bi bi-pencil-square"></i> 編集
-                    </a>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        <div class="card-body">
-            <!-- 問題文セクション -->
-            <div class="mb-4">
-                <h5 class="border-bottom pb-2 text-primary">問題文</h5>
-                <div class="bg-light p-4 rounded-3 math-font problem-content">
-                    {{ math_format(data["content"]) | replace("\r\n", "<br>") | safe }}
-                </div>
-            </div>
-            <!-- 配点セクション -->
-            <div class="mb-4">
-                <h5 class="border-bottom pb-2 text-primary">配点</h5>
-                <div class="bg-light p-4 rounded-3">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <ol class="mb-0">
-                                {% for i in data["score"][0] %}
-                                <li class="mb-1">{{ i }}点</li>
-                                {% endfor %}
-                            </ol>
-                        </div>
-                        <div class="col-md-6 d-flex align-items-center justify-content-md-end mt-3 mt-md-0">
-                            {% if data["score"][2]!=1 %}
-                            <div class="badge bg-success fs-6 p-2">合計：{{ data["score"][1] }}点</div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- 解答解説セクション -->
-            {% if current_user.id==data["userid"] or (current_user.is_authenticated and "my_answer" in submissions and submissions["my_answer"]["judged"]) %}
-            <div class="mb-4">
-                <h5 class="border-bottom pb-2 text-primary">解答解説</h5>
-                <div class="accordion" id="explanation-accordion">
-                    <div class="accordion-item border rounded-3 shadow-sm">
-                        <h2 class="accordion-header" id="explanation-heading">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explanation-accordion-body" aria-expanded="false" aria-controls="explanation-accordion-body">
-                                解答解説を表示する
-                            </button>
-                        </h2>
-                        <div id="explanation-accordion-body" class="accordion-collapse collapse" aria-labelledby="explanation-heading">
-                            <div class="accordion-body math-font bg-light">
-                                {{ math_format(data["explanation"]) | replace("\r\n", "<br>") | safe }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-            <!-- 採点セクション -->
-            <div class="mb-4">
-                {% if current_user.is_authenticated %}
-                    {% if current_user.id==data["userid"] %}
-                        <h5 class="border-bottom pb-2 text-primary">採点する</h5>
-                        <div class="accordion" id="judgement-accordion">
-                            {% for i in submissions %}
-                                <div class="accordion-item border rounded-3 shadow-sm mb-3">
-                                    <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ i['id'] | string }}" aria-expanded="false" aria-controls="collapse{{ i['id'] | string }}">
-                                            <div class="d-flex justify-content-between align-items-center w-100">
-                                                <div>提出 ID: {{ i["id"] }}</div>
-                                                <div>
-                                                    {% if i["judged"] %}
-                                                    <span class="badge bg-success">採点済み：{{i["score"][1]}}点/{{data["score"][1]}}</span>
-                                                    {% else %}
-                                                    <span class="badge bg-warning text-dark">未採点 - {{ i["created_at"] }}</span>
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                        </button>
-                                    </h2>
-                                    <div class="accordion-collapse collapse" id="collapse{{ i['id'] | string }}">
-                                        <div class="accordion-body">
-                                            <h6 class="fw-bold mb-3 border-bottom pb-2">答案</h6>
-                                            <div class="math-font bg-light p-3 rounded-3 mb-4">
-                                                {{ math_format(i["content"]) | replace("\r\n", "<br>") | safe }}
-                                            </div>
-                                            {% if not(i["judged"]) %}
-                                            <div class="card border-0 shadow-sm p-3 mb-3">
-                                                <form method="post" class="scoring-form">
-                                                    {% for j in range(data["score"][2]) %}
-                                                    <div class="mb-3">
-                                                        <label for="score{{ i['id'] | string }}.{{ j | string }}" class="form-label d-flex justify-content-between">
-                                                            <span>問{{ j+1 }}</span>
-                                                            <span class="text-primary"><span id="value{{ j }}">0</span>点 / {{ data['score'][0][j] }}点</span>
-                                                        </label>
-                                                        <input type="range" name="score{{ i['id'] | string }}.{{ j | string }}" 
-                                                               id="score{{ i['id'] | string }}.{{ j | string }}" 
-                                                               class="form-range" min="0" max="{{ data['score'][0][j] }}" value="0" 
-                                                               oninput="document.getElementById('value{{ j }}').textContent = this.value">
-                                                    </div>
-                                                    {% endfor %}
-                                                    <div class="mb-3">
-                                                        <label for="comment{{ i['id'] | string }}" class="form-label">採点者のコメント</label>
-                                                        <textarea name="comment{{ i['id'] | string }}" id="comment{{ i['id'] | string }}" class="form-control" rows="3" placeholder="採点者のコメントを入力してください。(部分点の根拠など)"></textarea>
-                                                    </div>
-                                                    <div class="d-grid">
-                                                        <button type="submit" class="btn btn-primary" name="btn" value="{{ i['id'] | string }}">
-                                                            <i class="bi bi-check-circle"></i> 採点を確定
-                                                        </button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                            {% else %}
-                                            <div class="card border-0 bg-light p-3 mb-3">
-                                                <h6 class="fw-bold mb-3 border-bottom pb-2">得点</h6>
-                                                <div class="row mb-3">
-                                                    {% for j in range(i["score"][2]) %}
-                                                    <div class="col-md-4 mb-2">
-                                                        <div class="d-flex justify-content-between">
-                                                            <span>問{{ j+1 }}:</span>
-                                                            <span class="text-primary fw-bold">{{ i["score"][0][j] }}点 / {{ data["score"][0][j] }}点</span>
-                                                        </div>
-                                                    </div>
-                                                    {% endfor %}
-                                                </div>
-                                                <h6 class="fw-bold mb-2 border-bottom pb-2">採点者のコメント</h6>
-                                                <p class="mb-0">{{ i["comment"] }}</p>
-                                            </div>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {% if submissions == [] %}
-                            <h5 class="border-bottom pb-2 text-primary">回答する</h5>
-                            <div class="card border-0 shadow-sm p-0 overflow-hidden">
-                                <div class="card-body">
-                                    <form method="post">
-                                        <div class="mb-4">
-                                            <label for="answer" class="form-label">答案</label>
-                                            <small class="text-muted d-block mb-2">記述は任意ですが、部分点がもらえる可能性があります。採点者に分かる形で答案を作成してください。</small>
-                                            <textarea name="answer" id="answer" class="form-control" rows="6" required placeholder="(答)\(\boxed{\dfrac{1}{2}x^2+x+2}\)"></textarea>
-                                        </div>
-                                        <div class="mb-4">
-                                            <label for="preview" class="form-label">プレビュー</label>
-                                            <div id="preview" class="border rounded bg-light p-4 math-font" style="min-height: 120px;"></div>
-                                        </div>
-                                        <div class="d-grid">
-                                            <button type="submit" class="btn btn-primary btn-lg">
-                                                <i class="bi bi-send"></i> 提出する
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        {% else %}
-                            {% if submissions["my_answer"]["judged"] %}
-                                <h5 class="border-bottom pb-2 text-primary">回答</h5>
-                                <div class="accordion" id="answer-accordion">
-                                    {% for i in [submissions["my_answer"]] + submissions["all_answers"] %}
-                                        {% if i["userid"]==current_user.id %}
-                                            <h6 class="mt-4 mb-3 text-primary">自分の回答</h6>
-                                        {% endif %}
-                                        <div class="accordion-item border rounded-3 shadow-sm mb-3">
-                                            <h2 class="accordion-header">
-                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ i['id'] | string }}" aria-expanded="false" aria-controls="collapse{{ i['id'] | string }}">
-                                                    <div class="d-flex justify-content-between align-items-center w-100">
-                                                        <div>提出 ID: {{ i["id"] }}</div>
-                                                        <div>
-                                                            <span class="badge bg-success">得点：{{i["score"][1]}}点/{{data["score"][1]}}点</span>
-                                                        </div>
-                                                    </div>
-                                                </button>
-                                            </h2>
-                                            <div class="accordion-collapse collapse" id="collapse{{ i['id'] | string }}">
-                                                <div class="accordion-body">
-                                                    <h6 class="fw-bold mb-3 border-bottom pb-2">答案</h6>
-                                                    <div class="math-font bg-light p-3 rounded-3 mb-4">
-                                                        {{ math_format(i["content"]) | replace("\r\n", "<br>") | safe }}
-                                                    </div>
-                                                    
-                                                    <div class="card border-0 bg-light p-3 mb-3">
-                                                        <h6 class="fw-bold mb-3 border-bottom pb-2">得点</h6>
-                                                        <div class="row mb-3">
-                                                            {% for j in range(i["score"][2]) %}
-                                                            <div class="col-md-4 mb-2">
-                                                                <div class="d-flex justify-content-between">
-                                                                    <span>問{{ j+1 }}:</span>
-                                                                    <span class="text-primary fw-bold">{{ i["score"][0][j] }}点 / {{ data["score"][0][j] }}点</span>
-                                                                </div>
-                                                            </div>
-                                                            {% endfor %}
-                                                        </div>
-                                                        <h6 class="fw-bold mb-2 border-bottom pb-2">採点者のコメント</h6>
-                                                        <p class="mb-0">{{ i["comment"] }}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        {% if i["userid"]==current_user.id and submissions["all_answers"] | length != 0 %}
-                                            <h6 class="mt-4 mb-3 text-primary">ほかの人の回答</h6>
-                                        {% endif %}
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                <h5 class="border-bottom pb-2 text-primary">答案を編集する</h5>
-                                <div class="card border-0 shadow-sm p-0 overflow-hidden">
-                                    <div class="card-body">
-                                        <form method="post">
-                                            <div class="mb-4">
-                                                <label for="re-answer" class="form-label">答案</label>
-                                                <textarea name="re-answer" id="re-answer" class="form-control" rows="6" required placeholder="(答)\(\boxed{\dfrac{1}{2}x^2+x+2}\)">{{ submissions["my_answer"]["content"] }}</textarea>
-                                            </div>
-                                            <div class="mb-4">
-                                                <label for="re-preview" class="form-label">プレビュー</label>
-                                                <div id="re-preview" class="border rounded bg-light p-4 math-font" style="min-height: 120px;">{{ math_format(submissions["my_answer"]["content"]) | replace("\r\n", "<br>") | safe }}</div>
-                                            </div>
-                                            <div class="d-grid">
-                                                <button type="submit" class="btn btn-primary btn-lg">
-                                                    <i class="bi bi-send"></i> 提出する
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            {% endif %}
-                        {% endif %}
-                    {% endif %}
-                {% else %}
-                    <div class="d-grid gap-2 col-md-6 mx-auto">
-                        <a href="{{ url_for('account.login') }}" class="btn btn-primary btn-lg">
-                            <i class="bi bi-box-arrow-in-right"></i> ログインして回答する
-                        </a>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
+	<div class="card shadow border-0 rounded-lg">
+		<div class="card-header bg-transparent">
+			<h1 class="card-title h3 text-primary my-3">{{ data["title"] }}</h1>
+			<div class="row align-items-center">
+				<div class="col-md-6">
+					<p class="mb-1">
+						<span class="badge bg-secondary me-2">投稿者</span>
+						{{ data["user"] }}{% if data["userid"]==1 %} <span class="badge bg-danger">admin</span>{% endif %}
+					</p>
+					<p class="mb-0">
+						<span class="badge bg-primary me-2">カテゴリ</span>
+						{{ data["category"] }}・{{ data["unit"] }}
+					</p>
+				</div>
+				<div class="col-md-6 text-md-end mt-3 mt-md-0">
+					{% if current_user.id==data["userid"] %}
+					<a href="{{ url_for('math.edit', id=data['id']) }}" class="btn btn-primary">
+						<i class="bi bi-pencil-square"></i> 編集
+					</a>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+		<div class="card-body">
+			<!-- 問題文セクション -->
+			<div class="mb-4">
+				<div class="row">
+					<div class="col">
+						<h5 class="border-bottom pb-2 text-primary">問題文</h5>
+					</div>
+					<div class="col-md-auto">
+						<a href="{{ url_for('math.pdf', id=data['id']) }}" class="btn btn-primary">
+							<i class="bi bi-pencil-square"></i> PDFで表示
+						</a>
+					</div>
+				</div>
+				<div class="bg-light p-4 rounded-3 math-font problem-content">
+					{{ math_format(data["content"]) | replace("\r\n", "<br>") | safe }}
+				</div>
+			</div>
+			<!-- 配点セクション -->
+			<div class="mb-4">
+				<h5 class="border-bottom pb-2 text-primary">配点</h5>
+				<div class="bg-light p-4 rounded-3">
+					<div class="row">
+						<div class="col-md-6">
+							<ol class="mb-0">
+								{% for i in data["score"][0] %}
+								<li class="mb-1">{{ i }}点</li>
+								{% endfor %}
+							</ol>
+						</div>
+						<div class="col-md-6 d-flex align-items-center justify-content-md-end mt-3 mt-md-0">
+							{% if data["score"][2]!=1 %}
+							<div class="badge bg-success fs-6 p-2">合計：{{ data["score"][1] }}点</div>
+							{% endif %}
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- 解答解説セクション -->
+			{% if current_user.id==data["userid"] or (current_user.is_authenticated and "my_answer" in submissions and submissions["my_answer"]["judged"]) %}
+			<div class="mb-4">
+				<div class="row">
+					<div class="col">
+						<h5 class="border-bottom pb-2 text-primary">解答解説</h5>
+					</div>
+					<div class="col-md-auto">
+						<a href="{{ url_for('math.ans_pdf', id=data['id']) }}" class="btn btn-primary">
+							<i class="bi bi-pencil-square"></i> PDFで表示
+						</a>
+					</div>
+				</div>
+				<div class="accordion" id="explanation-accordion">
+					<div class="accordion-item border rounded-3 shadow-sm">
+						<h2 class="accordion-header" id="explanation-heading">
+							<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#explanation-accordion-body" aria-expanded="false" aria-controls="explanation-accordion-body">
+								解答解説を表示する
+							</button>
+						</h2>
+						<div id="explanation-accordion-body" class="accordion-collapse collapse" aria-labelledby="explanation-heading">
+							<div class="accordion-body math-font bg-light">
+								{{ math_format(data["explanation"]) | replace("\r\n", "<br>") | safe }}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			{% endif %}
+			<!-- 採点セクション -->
+			<div class="mb-4">
+				{% if current_user.is_authenticated %}
+					{% if current_user.id==data["userid"] %}
+						<h5 class="border-bottom pb-2 text-primary">採点する</h5>
+						<div class="accordion" id="judgement-accordion">
+							{% for i in submissions %}
+								<div class="accordion-item border rounded-3 shadow-sm mb-3">
+									<h2 class="accordion-header">
+										<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ i['id'] | string }}" aria-expanded="false" aria-controls="collapse{{ i['id'] | string }}">
+											<div class="d-flex justify-content-between align-items-center w-100">
+												<div>提出 ID: {{ i["id"] }}</div>
+												<div>
+													{% if i["judged"] %}
+													<span class="badge bg-success">採点済み：{{i["score"][1]}}点/{{data["score"][1]}}</span>
+													{% else %}
+													<span class="badge bg-warning text-dark">未採点 - {{ i["created_at"] }}</span>
+													{% endif %}
+												</div>
+											</div>
+										</button>
+									</h2>
+									<div class="accordion-collapse collapse" id="collapse{{ i['id'] | string }}">
+										<div class="accordion-body">
+											<h6 class="fw-bold mb-3 border-bottom pb-2">答案</h6>
+											<div class="math-font bg-light p-3 rounded-3 mb-4">
+												{{ math_format(i["content"]) | replace("\r\n", "<br>") | safe }}
+											</div>
+											{% if not(i["judged"]) %}
+											<div class="card border-0 shadow-sm p-3 mb-3">
+												<form method="post" class="scoring-form">
+													{% for j in range(data["score"][2]) %}
+													<div class="mb-3">
+														<label for="score{{ i['id'] | string }}.{{ j | string }}" class="form-label d-flex justify-content-between">
+															<span>問{{ j+1 }}</span>
+															<span class="text-primary"><span id="value{{ j }}">0</span>点 / {{ data['score'][0][j] }}点</span>
+														</label>
+														<input type="range" name="score{{ i['id'] | string }}.{{ j | string }}" 
+															   id="score{{ i['id'] | string }}.{{ j | string }}" 
+															   class="form-range" min="0" max="{{ data['score'][0][j] }}" value="0" 
+															   oninput="document.getElementById('value{{ j }}').textContent = this.value">
+													</div>
+													{% endfor %}
+													<div class="mb-3">
+														<label for="comment{{ i['id'] | string }}" class="form-label">採点者のコメント</label>
+														<textarea name="comment{{ i['id'] | string }}" id="comment{{ i['id'] | string }}" class="form-control" rows="3" placeholder="採点者のコメントを入力してください。(部分点の根拠など)"></textarea>
+													</div>
+													<div class="d-grid">
+														<button type="submit" class="btn btn-primary" name="btn" value="{{ i['id'] | string }}">
+															<i class="bi bi-check-circle"></i> 採点を確定
+														</button>
+													</div>
+												</form>
+											</div>
+											{% else %}
+											<div class="card border-0 bg-light p-3 mb-3">
+												<h6 class="fw-bold mb-3 border-bottom pb-2">得点</h6>
+												<div class="row mb-3">
+													{% for j in range(i["score"][2]) %}
+													<div class="col-md-4 mb-2">
+														<div class="d-flex justify-content-between">
+															<span>問{{ j+1 }}:</span>
+															<span class="text-primary fw-bold">{{ i["score"][0][j] }}点 / {{ data["score"][0][j] }}点</span>
+														</div>
+													</div>
+													{% endfor %}
+												</div>
+												<h6 class="fw-bold mb-2 border-bottom pb-2">採点者のコメント</h6>
+												<p class="mb-0">{{ i["comment"] }}</p>
+											</div>
+											{% endif %}
+										</div>
+									</div>
+								</div>
+							{% endfor %}
+						</div>
+					{% else %}
+						{% if submissions == [] %}
+							<h5 class="border-bottom pb-2 text-primary">回答する</h5>
+							<div class="card border-0 shadow-sm p-0 overflow-hidden">
+								<div class="card-body">
+									<form method="post">
+										<div class="mb-4">
+											<label for="answer" class="form-label">答案</label>
+											<small class="text-muted d-block mb-2">記述は任意ですが、部分点がもらえる可能性があります。採点者に分かる形で答案を作成してください。</small>
+											<textarea name="answer" id="answer" class="form-control" rows="6" required placeholder="(答)\(\boxed{\dfrac{1}{2}x^2+x+2}\)"></textarea>
+										</div>
+										<div class="mb-4">
+											<label for="preview" class="form-label">プレビュー</label>
+											<div id="preview" class="border rounded bg-light p-4 math-font" style="min-height: 120px;"></div>
+										</div>
+										<div class="d-grid">
+											<button type="submit" class="btn btn-primary btn-lg">
+												<i class="bi bi-send"></i> 提出する
+											</button>
+										</div>
+									</form>
+								</div>
+							</div>
+						{% else %}
+							{% if submissions["my_answer"]["judged"] %}
+								<h5 class="border-bottom pb-2 text-primary">回答</h5>
+								<div class="accordion" id="answer-accordion">
+									{% for i in [submissions["my_answer"]] + submissions["all_answers"] %}
+										{% if i["userid"]==current_user.id %}
+											<h6 class="mt-4 mb-3 text-primary">自分の回答</h6>
+										{% endif %}
+										<div class="accordion-item border rounded-3 shadow-sm mb-3">
+											<h2 class="accordion-header">
+												<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ i['id'] | string }}" aria-expanded="false" aria-controls="collapse{{ i['id'] | string }}">
+													<div class="d-flex justify-content-between align-items-center w-100">
+														<div>提出 ID: {{ i["id"] }}</div>
+														<div>
+															<span class="badge bg-success">得点：{{i["score"][1]}}点/{{data["score"][1]}}点</span>
+														</div>
+													</div>
+												</button>
+											</h2>
+											<div class="accordion-collapse collapse" id="collapse{{ i['id'] | string }}">
+												<div class="accordion-body">
+													<h6 class="fw-bold mb-3 border-bottom pb-2">答案</h6>
+													<div class="math-font bg-light p-3 rounded-3 mb-4">
+														{{ math_format(i["content"]) | replace("\r\n", "<br>") | safe }}
+													</div>
+													
+													<div class="card border-0 bg-light p-3 mb-3">
+														<h6 class="fw-bold mb-3 border-bottom pb-2">得点</h6>
+														<div class="row mb-3">
+															{% for j in range(i["score"][2]) %}
+															<div class="col-md-4 mb-2">
+																<div class="d-flex justify-content-between">
+																	<span>問{{ j+1 }}:</span>
+																	<span class="text-primary fw-bold">{{ i["score"][0][j] }}点 / {{ data["score"][0][j] }}点</span>
+																</div>
+															</div>
+															{% endfor %}
+														</div>
+														<h6 class="fw-bold mb-2 border-bottom pb-2">採点者のコメント</h6>
+														<p class="mb-0">{{ i["comment"] }}</p>
+													</div>
+												</div>
+											</div>
+										</div>
+										{% if i["userid"]==current_user.id and submissions["all_answers"] | length != 0 %}
+											<h6 class="mt-4 mb-3 text-primary">ほかの人の回答</h6>
+										{% endif %}
+									{% endfor %}
+								</div>
+							{% else %}
+								<h5 class="border-bottom pb-2 text-primary">答案を編集する</h5>
+								<div class="card border-0 shadow-sm p-0 overflow-hidden">
+									<div class="card-body">
+										<form method="post">
+											<div class="mb-4">
+												<label for="re-answer" class="form-label">答案</label>
+												<textarea name="re-answer" id="re-answer" class="form-control" rows="6" required placeholder="(答)\(\boxed{\dfrac{1}{2}x^2+x+2}\)">{{ submissions["my_answer"]["content"] }}</textarea>
+											</div>
+											<div class="mb-4">
+												<label for="re-preview" class="form-label">プレビュー</label>
+												<div id="re-preview" class="border rounded bg-light p-4 math-font" style="min-height: 120px;">{{ math_format(submissions["my_answer"]["content"]) | replace("\r\n", "<br>") | safe }}</div>
+											</div>
+											<div class="d-grid">
+												<button type="submit" class="btn btn-primary btn-lg">
+													<i class="bi bi-send"></i> 提出する
+												</button>
+											</div>
+										</form>
+									</div>
+								</div>
+							{% endif %}
+						{% endif %}
+					{% endif %}
+				{% else %}
+					<div class="d-grid gap-2 col-md-6 mx-auto">
+						<a href="{{ url_for('account.login') }}" class="btn btn-primary btn-lg">
+							<i class="bi bi-box-arrow-in-right"></i> ログインして回答する
+						</a>
+					</div>
+				{% endif %}
+			</div>
+		</div>
+	</div>
 </div>
 {% include "math/problems/event.js.html" %}
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // 問題プレビュー機能
-        const answer = document.getElementById("answer");
-        const preview = document.getElementById("preview");
+	document.addEventListener('DOMContentLoaded', () => {
+		// 問題プレビュー機能
+		const answer = document.getElementById("answer");
+		const preview = document.getElementById("preview");
 
-        if (answer && preview) {
-            listener(answer, preview);
-            
-            // サンプルのLatexコードを初期表示
-            const latexCode = "(答)\\(\\boxed{\\dfrac{1}{2}x^2+x+2}\\)";
-            mathjaxupdate(preview, latexCode);
-        }
+		if (answer && preview) {
+			listener(answer, preview);
+			
+			// サンプルのLatexコードを初期表示
+			const latexCode = "(答)\\(\\boxed{\\dfrac{1}{2}x^2+x+2}\\)";
+			mathjaxupdate(preview, latexCode);
+		}
 
-        // 回答編集のプレビュー機能
-        const reAnswer = document.getElementById("re-answer");
-        const rePreview = document.getElementById("re-preview");
-        if (reAnswer && rePreview) {
-            listener(reAnswer, rePreview);
-        }
-    });
+		// 回答編集のプレビュー機能
+		const reAnswer = document.getElementById("re-answer");
+		const rePreview = document.getElementById("re-preview");
+		if (reAnswer && rePreview) {
+			listener(reAnswer, rePreview);
+		}
+	});
 </script>
 
 <style>
-    .problem-container {
-        max-width: 1000px;
-        margin: 0 auto;
-    }
-    
-    .problem-content {
-        line-height: 1.8;
-    }
-    
-    .card {
-        border-radius: 10px;
-        overflow: hidden;
-        transition: all 0.3s ease;
-    }
-    
-    .card-header {
-        border-bottom: 1px solid rgba(0,0,0,0.05);
-    }
-    
-    .accordion-button:not(.collapsed) {
-        background-color: rgba(108, 99, 255, 0.1);
-        color: var(--primary-color);
-        box-shadow: none;
-    }
-    
-    .accordion-button:focus {
-        box-shadow: none;
-        border-color: rgba(108, 99, 255, 0.25);
-    }
-    
-    .form-control {
-        padding: 0.75rem;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-    }
-    
-    .form-control:focus {
-        border-color: var(--accent-color);
-        box-shadow: 0 0 0 0.25rem rgba(108, 99, 255, 0.25);
-    }
-    
-    .form-range::-webkit-slider-thumb {
-        background: var(--accent-color);
-    }
-    
-    .form-range::-moz-range-thumb {
-        background: var(--accent-color);
-    }
-    
-    .badge {
-        font-weight: 500;
-        padding: 0.5em 0.8em;
-    }
-    
-    .btn-primary {
-        background-color: var(--accent-color);
-        border-color: var(--accent-color);
-        transition: all 0.3s ease;
-    }
-    
-    .btn-primary:hover {
-        background-color: #5651db;
-        border-color: #5651db;
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(108, 99, 255, 0.2);
-    }
-    
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    .card {
-        animation: fadeInUp 0.6s ease-out forwards;
-    }
-    
-    .problem-content {
-        animation: fadeInUp 0.6s ease-out 0.2s forwards;
-        opacity: 0;
-    }
-    
-    .accordion-button {
-        transition: background-color 0.3s ease;
-    }
-    
-    .accordion-button:hover:not(.collapsed) {
-        background-color: rgba(108, 99, 255, 0.15);
-    }
-    
-    .accordion-button.collapsed:hover {
-        background-color: rgba(108, 99, 255, 0.05);
-    }
+	.problem-container {
+		max-width: 1000px;
+		margin: 0 auto;
+	}
+	
+	.problem-content {
+		line-height: 1.8;
+	}
+	
+	.card {
+		border-radius: 10px;
+		overflow: hidden;
+		transition: all 0.3s ease;
+	}
+	
+	.card-header {
+		border-bottom: 1px solid rgba(0,0,0,0.05);
+	}
+	
+	.accordion-button:not(.collapsed) {
+		background-color: rgba(108, 99, 255, 0.1);
+		color: var(--primary-color);
+		box-shadow: none;
+	}
+	
+	.accordion-button:focus {
+		box-shadow: none;
+		border-color: rgba(108, 99, 255, 0.25);
+	}
+	
+	.form-control {
+		padding: 0.75rem;
+		border-radius: 8px;
+		transition: all 0.3s ease;
+	}
+	
+	.form-control:focus {
+		border-color: var(--accent-color);
+		box-shadow: 0 0 0 0.25rem rgba(108, 99, 255, 0.25);
+	}
+	
+	.form-range::-webkit-slider-thumb {
+		background: var(--accent-color);
+	}
+	
+	.form-range::-moz-range-thumb {
+		background: var(--accent-color);
+	}
+	
+	.badge {
+		font-weight: 500;
+		padding: 0.5em 0.8em;
+	}
+	
+	.btn-primary {
+		background-color: var(--accent-color);
+		border-color: var(--accent-color);
+		transition: all 0.3s ease;
+	}
+	
+	.btn-primary:hover {
+		background-color: #5651db;
+		border-color: #5651db;
+		transform: translateY(-2px);
+		box-shadow: 0 5px 15px rgba(108, 99, 255, 0.2);
+	}
+	
+	@keyframes fadeInUp {
+		from {
+			opacity: 0;
+			transform: translateY(30px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+	
+	.card {
+		animation: fadeInUp 0.6s ease-out forwards;
+	}
+	
+	.problem-content {
+		animation: fadeInUp 0.6s ease-out 0.2s forwards;
+		opacity: 0;
+	}
+	
+	.accordion-button {
+		transition: background-color 0.3s ease;
+	}
+	
+	.accordion-button:hover:not(.collapsed) {
+		background-color: rgba(108, 99, 255, 0.15);
+	}
+	
+	.accordion-button.collapsed:hover {
+		background-color: rgba(108, 99, 255, 0.05);
+	}
 </style>
 {% endblock %}

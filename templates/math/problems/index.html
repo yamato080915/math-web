@@ -2,410 +2,410 @@
 {% block title %}Math Problems{% endblock %}
 {% block content %}
 <div class="container mt-5 problems-container">
-    <div class="row align-items-center mb-4">
-        <div class="col">
-            <h1 class="page-title">Problems</h1>
-        </div>
-        <div class="col text-end">
-            <a href="{{ url_for('math.post') }}" class="btn btn-primary post-btn">問題を投稿</a>
-        </div>
-    </div>
-    
-    <div class="container my-4 category-section">
-        <h4 class="section-title">単元から選択</h4>
-        <div class="accordion custom-accordion" id="categoryAccordion">
-            {% set math = {
-                "数学Ⅰ": ["数と式", "2次関数", "集合と命題", "図形と計量", "データの分析"],
-                "数学Ａ": ["場合の数", "確率", "図形の性質", "整数"],
-                "数学Ⅱ": ["式と計算", "高次方程式", "図形と方程式", "三角関数", "指数関数と対数関数", "微分法", "積分法"],
-                "数学Ｂ": ["数列", "確率分布と統計的な推測"],
-                "数学Ⅲ": ["極限", "微分法", "積分法"],
-                "数学Ｃ": ["平面ベクトル", "空間ベクトル", "複素数平面", "式と曲線"]
-            } %}
-            {% for i in math %}
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="{{ i }}">
-                        <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#{{ i }}units" aria-expanded="false" aria-controls="{{ i }}units">
-                            {{ i }}
-                        </button>
-                    </h2>
-                    <div class="accordion-collapse collapse" id="{{ i }}units" aria-labelledby="{{ i }}" data-bs-parent="#categoryAccordion">
-                        <ul class="list-group category-list">
-                            <li class="list-group-item">
-                                <input type="checkbox" name="All{{i}}" id="All{{i}}" class="form-check-input me-1 select-all" data-category="{{ i }}">
-                                <label for="All{{i}}" class="form-check-label">すべて選択</label>
-                            </li>
-                            {% for j in math[i] %}
-                                <li class="list-group-item">
-                                    <input type="checkbox" name="All{{i}}{{j}}" id="All{{i}}{{j}}" class="form-check-input me-1 unit-checkbox" data-category="{{ i }}" data-unit="{{ j }}">
-                                    <label for="All{{i}}{{j}}" class="form-check-label">{{j}}</label>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-    
-    <div class="container my-4 filtered-section">
-        <h4 class="section-title">選択した単元の問題</h4>
-        <div id="filteredProblems" class="list-group custom-list-group">
-            <p>該当する問題がありません。</p>
-        </div>
-    </div>
-    
-    <div class="container my-4 random-section">
-        <h4 class="section-title">ランダム問題</h4>
-        <div class="card shadow-sm border-0 rounded-lg mb-3">
-            <div class="card-body">
-                <h5 class="card-title mb-3">
-                    <a href="{{ url_for('math.problem', id=data['random']['id']) }}" class="text-decoration-none text-primary stretched-link">
-                        {{ data['random']["title"] }}
-                    </a>
-                </h5>
-                <div class="row align-items-center">
-                    <div class="col-md-6">
-                        <p class="mb-0">
-                            <span class="badge bg-primary me-2">カテゴリ</span>
-                            {{ data['random']["category"] }}・{{ data['random']["unit"] }}
-                        </p>
-                    </div>
-                    <div class="col-md-6 text-md-end mt-2 mt-md-0">
-                        <p class="mb-0">
-                            <span class="badge bg-secondary me-2">投稿者</span>
-                            {{ data['random']["user"] }}
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    {% if data["new"]!=[] %}
-        <div class="container my-4 new-section">
-            <h4 class="section-title">新規</h4>
-            <div class="problem-list">
-                {% for i in data["new"] %}
-                    <div class="card shadow-sm border-0 rounded-lg mb-3 problem-card">
-                        <div class="card-body">
-                            <h5 class="card-title mb-3">
-                                <a href="{{ url_for('math.problem', id=i['id']) }}" class="text-decoration-none text-primary stretched-link">
-                                    {{ i["title"] }}
-                                </a>
-                            </h5>
-                            <div class="row align-items-center">
-                                <div class="col-md-6">
-                                    <p class="mb-0">
-                                        <span class="badge bg-primary me-2">カテゴリ</span>
-                                        {{ i["category"] }}・{{ i["unit"] }}
-                                    </p>
-                                </div>
-                                <div class="col-md-6 text-md-end mt-2 mt-md-0">
-                                    <p class="mb-0">
-                                        <span class="badge bg-secondary me-2">投稿者</span>
-                                        {{ i["user"] }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-    {% endif %}
-    
-    <div class="container my-4 my-problems-section">
-        <h4 class="section-title">自分の問題</h4>
-        <div class="problem-list">
-            {% for i in data["my-problem"] %}
-                <div class="card shadow-sm border-0 rounded-lg mb-3 problem-card">
-                    <div class="card-body">
-                        <h5 class="card-title mb-3">
-                            <a href="{{ url_for('math.problem', id=i['id']) }}" class="text-decoration-none text-primary stretched-link">
-                                {{ i["title"] }}
-                            </a>
-                        </h5>
-                        <div class="row align-items-center">
-                            <div class="col-md-6">
-                                <p class="mb-0">
-                                    <span class="badge bg-primary me-2">カテゴリ</span>
-                                    {{ i["category"] }}・{{ i["unit"] }}
-                                </p>
-                            </div>
-                            <div class="col-md-6 text-md-end mt-2 mt-md-0">
-                                <p class="mb-0">
-                                    <span class="badge bg-secondary me-2">投稿者</span>
-                                    {{ i["user"] }}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-    
-    <div class="container my-5">
-        <a href="{{ url_for('math.problemsAll') }}" class="btn btn-primary d-grid view-all-btn">問題をすべて見る</a>
-    </div>
+	<div class="row align-items-center mb-4">
+		<div class="col">
+			<h1 class="page-title">Problems</h1>
+		</div>
+		<div class="col text-end">
+			<a href="{{ url_for('math.post') }}" class="btn btn-primary post-btn">問題を投稿</a>
+		</div>
+	</div>
+	
+	<div class="container my-4 category-section">
+		<h4 class="section-title">単元から選択</h4>
+		<div class="accordion custom-accordion" id="categoryAccordion">
+			{% set math = {
+				"数学Ⅰ": ["数と式", "2次関数", "集合と命題", "図形と計量", "データの分析"],
+				"数学Ａ": ["場合の数", "確率", "図形の性質", "整数"],
+				"数学Ⅱ": ["式と計算", "高次方程式", "図形と方程式", "三角関数", "指数関数と対数関数", "微分法", "積分法"],
+				"数学Ｂ": ["数列", "確率分布と統計的な推測"],
+				"数学Ⅲ": ["極限", "微分法", "積分法"],
+				"数学Ｃ": ["平面ベクトル", "空間ベクトル", "複素数平面", "式と曲線"]
+			} %}
+			{% for i in math %}
+				<div class="accordion-item">
+					<h2 class="accordion-header" id="{{ i }}">
+						<button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#{{ i }}units" aria-expanded="false" aria-controls="{{ i }}units">
+							{{ i }}
+						</button>
+					</h2>
+					<div class="accordion-collapse collapse" id="{{ i }}units" aria-labelledby="{{ i }}" data-bs-parent="#categoryAccordion">
+						<ul class="list-group category-list">
+							<li class="list-group-item">
+								<input type="checkbox" name="All{{i}}" id="All{{i}}" class="form-check-input me-1 select-all" data-category="{{ i }}">
+								<label for="All{{i}}" class="form-check-label">すべて選択</label>
+							</li>
+							{% for j in math[i] %}
+								<li class="list-group-item">
+									<input type="checkbox" name="All{{i}}{{j}}" id="All{{i}}{{j}}" class="form-check-input me-1 unit-checkbox" data-category="{{ i }}" data-unit="{{ j }}">
+									<label for="All{{i}}{{j}}" class="form-check-label">{{j}}</label>
+								</li>
+							{% endfor %}
+						</ul>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+	</div>
+	
+	<div class="container my-4 filtered-section">
+		<h4 class="section-title">選択した単元の問題</h4>
+		<div id="filteredProblems" class="list-group custom-list-group">
+			<p>該当する問題がありません。</p>
+		</div>
+	</div>
+	
+	<div class="container my-4 random-section">
+		<h4 class="section-title">ランダム問題</h4>
+		<div class="card shadow-sm border-0 rounded-lg mb-3">
+			<div class="card-body">
+				<h5 class="card-title mb-3">
+					<a href="{{ url_for('math.problem', id=data['random']['id']) }}" class="text-decoration-none text-primary stretched-link">
+						{{ data['random']["title"] }}
+					</a>
+				</h5>
+				<div class="row align-items-center">
+					<div class="col-md-6">
+						<p class="mb-0">
+							<span class="badge bg-primary me-2">カテゴリ</span>
+							{{ data['random']["category"] }}・{{ data['random']["unit"] }}
+						</p>
+					</div>
+					<div class="col-md-6 text-md-end mt-2 mt-md-0">
+						<p class="mb-0">
+							<span class="badge bg-secondary me-2">投稿者</span>
+							{{ data['random']["user"] }}
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	{% if data["new"]!=[] %}
+		<div class="container my-4 new-section">
+			<h4 class="section-title">新規</h4>
+			<div class="problem-list">
+				{% for i in data["new"] %}
+					<div class="card shadow-sm border-0 rounded-lg mb-3 problem-card">
+						<div class="card-body">
+							<h5 class="card-title mb-3">
+								<a href="{{ url_for('math.problem', id=i['id']) }}" class="text-decoration-none text-primary stretched-link">
+									{{ i["title"] }}
+								</a>
+							</h5>
+							<div class="row align-items-center">
+								<div class="col-md-6">
+									<p class="mb-0">
+										<span class="badge bg-primary me-2">カテゴリ</span>
+										{{ i["category"] }}・{{ i["unit"] }}
+									</p>
+								</div>
+								<div class="col-md-6 text-md-end mt-2 mt-md-0">
+									<p class="mb-0">
+										<span class="badge bg-secondary me-2">投稿者</span>
+										{{ i["user"] }}
+									</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+		</div>
+	{% endif %}
+	
+	<div class="container my-4 my-problems-section">
+		<h4 class="section-title">自分の問題</h4>
+		<div class="problem-list">
+			{% for i in data["my-problem"] %}
+				<div class="card shadow-sm border-0 rounded-lg mb-3 problem-card">
+					<div class="card-body">
+						<h5 class="card-title mb-3">
+							<a href="{{ url_for('math.problem', id=i['id']) }}" class="text-decoration-none text-primary stretched-link">
+								{{ i["title"] }}
+							</a>
+						</h5>
+						<div class="row align-items-center">
+							<div class="col-md-6">
+								<p class="mb-0">
+									<span class="badge bg-primary me-2">カテゴリ</span>
+									{{ i["category"] }}・{{ i["unit"] }}
+								</p>
+							</div>
+							<div class="col-md-6 text-md-end mt-2 mt-md-0">
+								<p class="mb-0">
+									<span class="badge bg-secondary me-2">投稿者</span>
+									{{ i["user"] }}
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+	</div>
+	
+	<div class="container my-5">
+		<a href="{{ url_for('math.problemsAll') }}" class="btn btn-primary d-grid view-all-btn">問題をすべて見る</a>
+	</div>
 </div>
 
 <style>
-    .problems-container {
-        max-width: 1200px;
-    }
+	.problems-container {
+		max-width: 1200px;
+	}
 
-    .page-title {
-        color: var(--primary-color);
-        font-weight: 600;
-        border-bottom: 2px solid var(--accent-color);
-        padding-bottom: 10px;
-        display: inline-block;
-    }
+	.page-title {
+		color: var(--primary-color);
+		font-weight: 600;
+		border-bottom: 2px solid var(--accent-color);
+		padding-bottom: 10px;
+		display: inline-block;
+	}
 
-    .section-title {
-        color: var(--primary-color);
-        font-weight: 500;
-        margin-bottom: 15px;
-        border-left: 4px solid var(--accent-color);
-        padding-left: 10px;
-    }
+	.section-title {
+		color: var(--primary-color);
+		font-weight: 500;
+		margin-bottom: 15px;
+		border-left: 4px solid var(--accent-color);
+		padding-left: 10px;
+	}
 
-    .custom-accordion .accordion-item {
-        border: 1px solid rgba(0,0,0,0.1);
-        border-radius: 8px;
-        margin-bottom: 10px;
-        overflow: hidden;
-    }
+	.custom-accordion .accordion-item {
+		border: 1px solid rgba(0,0,0,0.1);
+		border-radius: 8px;
+		margin-bottom: 10px;
+		overflow: hidden;
+	}
 
-    .custom-accordion .accordion-button {
-        background-color: white;
-        color: var(--primary-color);
-        font-weight: 500;
-    }
+	.custom-accordion .accordion-button {
+		background-color: white;
+		color: var(--primary-color);
+		font-weight: 500;
+	}
 
-    .custom-accordion .accordion-button:not(.collapsed) {
-        background-color: rgba(108, 99, 255, 0.05);
-        color: var(--accent-color);
-    }
+	.custom-accordion .accordion-button:not(.collapsed) {
+		background-color: rgba(108, 99, 255, 0.05);
+		color: var(--accent-color);
+	}
 
-    .custom-accordion .accordion-button:focus {
-        box-shadow: none;
-        border-color: rgba(108, 99, 255, 0.1);
-    }
+	.custom-accordion .accordion-button:focus {
+		box-shadow: none;
+		border-color: rgba(108, 99, 255, 0.1);
+	}
 
-    .category-list .list-group-item {
-        border-left: none;
-        border-right: none;
-        border-radius: 0;
-        transition: background-color 0.3s ease;
-    }
+	.category-list .list-group-item {
+		border-left: none;
+		border-right: none;
+		border-radius: 0;
+		transition: background-color 0.3s ease;
+	}
 
-    .category-list .list-group-item:hover {
-        background-color: rgba(108, 99, 255, 0.05);
-    }
+	.category-list .list-group-item:hover {
+		background-color: rgba(108, 99, 255, 0.05);
+	}
 
-    .custom-list-group .list-group-item {
-        border: 1px solid rgba(0,0,0,0.1);
-        border-radius: 8px;
-        margin-bottom: 8px;
-        transition: all 0.3s ease;
-    }
+	.custom-list-group .list-group-item {
+		border: 1px solid rgba(0,0,0,0.1);
+		border-radius: 8px;
+		margin-bottom: 8px;
+		transition: all 0.3s ease;
+	}
 
-    .custom-list-item {
-        border: 1px solid rgba(0,0,0,0.1);
-        border-radius: 8px;
-        margin-bottom: 8px;
-        transition: all 0.3s ease;
-        padding: 15px;
-    }
+	.custom-list-item {
+		border: 1px solid rgba(0,0,0,0.1);
+		border-radius: 8px;
+		margin-bottom: 8px;
+		transition: all 0.3s ease;
+		padding: 15px;
+	}
 
-    .custom-list-item:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-        border-color: var(--accent-color);
-    }
+	.custom-list-item:hover {
+		transform: translateY(-3px);
+		box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+		border-color: var(--accent-color);
+	}
 
-    .post-btn, .view-all-btn {
-        background-color: var(--accent-color);
-        border-color: var(--accent-color);
-        padding: 8px 20px;
-        font-weight: 500;
-        transition: all 0.3s ease;
-    }
+	.post-btn, .view-all-btn {
+		background-color: var(--accent-color);
+		border-color: var(--accent-color);
+		padding: 8px 20px;
+		font-weight: 500;
+		transition: all 0.3s ease;
+	}
 
-    .post-btn:hover, .view-all-btn:hover {
-        background-color: #5651db;
-        border-color: #5651db;
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(108, 99, 255, 0.2);
-    }
-    
-    .form-check-input:checked {
-        background-color: var(--accent-color);
-        border-color: var(--accent-color);
-    }
-    
-    .problem-card {
-        transition: all 0.3s ease;
-    }
-    
-    .problem-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
-    }
-    
-    .badge {
-        font-weight: 500;
-        padding: 0.5em 0.8em;
-    }
-    
-    .card-title {
-        font-weight: 600;
-    }
-    
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    @keyframes staggerFadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    .category-section {
-        animation: fadeInUp 0.6s ease-out 0.1s forwards;
-        opacity: 0;
-    }
-    
-    .filtered-section {
-        animation: fadeInUp 0.6s ease-out 0.2s forwards;
-        opacity: 0;
-    }
-    
-    .random-section {
-        animation: fadeInUp 0.6s ease-out 0.3s forwards;
-        opacity: 0;
-    }
-    
-    .new-section {
-        animation: fadeInUp 0.6s ease-out 0.4s forwards;
-        opacity: 0;
-    }
-    
-    .my-problems-section {
-        animation: fadeInUp 0.6s ease-out 0.5s forwards;
-        opacity: 0;
-    }
-    
-    .problem-card {
-        animation: staggerFadeIn 0.5s ease-out forwards;
-    }
-    
-    .problem-card.newly-added {
-        animation: fadeInUp 0.4s ease-out forwards;
-    }
+	.post-btn:hover, .view-all-btn:hover {
+		background-color: #5651db;
+		border-color: #5651db;
+		transform: translateY(-2px);
+		box-shadow: 0 5px 15px rgba(108, 99, 255, 0.2);
+	}
+	
+	.form-check-input:checked {
+		background-color: var(--accent-color);
+		border-color: var(--accent-color);
+	}
+	
+	.problem-card {
+		transition: all 0.3s ease;
+	}
+	
+	.problem-card:hover {
+		transform: translateY(-3px);
+		box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+	}
+	
+	.badge {
+		font-weight: 500;
+		padding: 0.5em 0.8em;
+	}
+	
+	.card-title {
+		font-weight: 600;
+	}
+	
+	@keyframes fadeInUp {
+		from {
+			opacity: 0;
+			transform: translateY(30px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+	
+	@keyframes staggerFadeIn {
+		from {
+			opacity: 0;
+			transform: translateY(20px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+	
+	.category-section {
+		animation: fadeInUp 0.6s ease-out 0.1s forwards;
+		opacity: 0;
+	}
+	
+	.filtered-section {
+		animation: fadeInUp 0.6s ease-out 0.2s forwards;
+		opacity: 0;
+	}
+	
+	.random-section {
+		animation: fadeInUp 0.6s ease-out 0.3s forwards;
+		opacity: 0;
+	}
+	
+	.new-section {
+		animation: fadeInUp 0.6s ease-out 0.4s forwards;
+		opacity: 0;
+	}
+	
+	.my-problems-section {
+		animation: fadeInUp 0.6s ease-out 0.5s forwards;
+		opacity: 0;
+	}
+	
+	.problem-card {
+		animation: staggerFadeIn 0.5s ease-out forwards;
+	}
+	
+	.problem-card.newly-added {
+		animation: fadeInUp 0.4s ease-out forwards;
+	}
 </style>
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // チェックボックスの機能
-        const selectAllCheckboxes = document.querySelectorAll('.select-all');
-        selectAllCheckboxes.forEach(selectAll => {
-            selectAll.addEventListener('change', (event) => {
-                const category = event.target.dataset.category;
-                const unitCheckboxes = document.querySelectorAll(`.unit-checkbox[data-category="${category}"]`);
-                unitCheckboxes.forEach(checkbox => {
-                    checkbox.checked = event.target.checked;
-                });
-            });
-        });
+	document.addEventListener('DOMContentLoaded', () => {
+		// チェックボックスの機能
+		const selectAllCheckboxes = document.querySelectorAll('.select-all');
+		selectAllCheckboxes.forEach(selectAll => {
+			selectAll.addEventListener('change', (event) => {
+				const category = event.target.dataset.category;
+				const unitCheckboxes = document.querySelectorAll(`.unit-checkbox[data-category="${category}"]`);
+				unitCheckboxes.forEach(checkbox => {
+					checkbox.checked = event.target.checked;
+				});
+			});
+		});
 
-        const allCheckboxes = document.querySelectorAll('.form-check-input');
+		const allCheckboxes = document.querySelectorAll('.form-check-input');
 
-        allCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', () => {
-                updateSelectedUnitsDisplay();
-            });
-        });
+		allCheckboxes.forEach(checkbox => {
+			checkbox.addEventListener('change', () => {
+				updateSelectedUnitsDisplay();
+			});
+		});
 
-        async function updateSelectedUnitsDisplay() {
-            const selectedUnits = Array.from(document.querySelectorAll('.unit-checkbox:checked')).map(checkbox => [
-                checkbox.dataset.category,
-                checkbox.dataset.unit
-            ]);
+		async function updateSelectedUnitsDisplay() {
+			const selectedUnits = Array.from(document.querySelectorAll('.unit-checkbox:checked')).map(checkbox => [
+				checkbox.dataset.category,
+				checkbox.dataset.unit
+			]);
 
-            try {
-                const response = await fetch("{{ url_for('math.problemsAll') }}", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ data: selectedUnits })
-                });
+			try {
+				const response = await fetch("{{ url_for('math.problemsAll') }}", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json"
+					},
+					body: JSON.stringify({ data: selectedUnits })
+				});
 
-                if (!response.ok) {
-                    throw new Error("データの取得に失敗しました。");
-                }
+				if (!response.ok) {
+					throw new Error("データの取得に失敗しました。");
+				}
 
-                const data = await response.json();
+				const data = await response.json();
 
-                // データを表示
-                const container = document.getElementById('filteredProblems');
-                container.innerHTML = '';
-                if (data.data.length > 0) {
-                    data.data.forEach(problem => {
-                        const problemElement = document.createElement('div');
-                        problemElement.className = 'card shadow-sm border-0 rounded-lg mb-3 problem-card';
-                        problemElement.innerHTML = `
-                            <div class="card-body">
-                                <h5 class="card-title mb-3">
-                                    <a href="{{ url_for('math.problem', id='') }}${problem.id}" class="text-decoration-none text-primary stretched-link">
-                                        ${problem.title}
-                                    </a>
-                                </h5>
-                                <div class="row align-items-center">
-                                    <div class="col-md-6">
-                                        <p class="mb-0">
-                                            <span class="badge bg-primary me-2">カテゴリ</span>
-                                            ${problem.category}・${problem.unit}
-                                        </p>
-                                    </div>
-                                    <div class="col-md-6 text-md-end mt-2 mt-md-0">
-                                        <p class="mb-0">
-                                            <span class="badge bg-secondary me-2">投稿者</span>
-                                            ${problem.user}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                        problemElement.classList.add('newly-added');
-                        container.appendChild(problemElement);
-                    });
-                    MathJax.typesetClear();
-                    MathJax.typesetPromise([container]);
-                } else {
-                    container.innerHTML = '<p>該当する問題がありません。</p>';
-                }
-            } catch (error) {
-                console.error("エラー:", error);
-            }
-        }
-    });
+				// データを表示
+				const container = document.getElementById('filteredProblems');
+				container.innerHTML = '';
+				if (data.data.length > 0) {
+					data.data.forEach(problem => {
+						const problemElement = document.createElement('div');
+						problemElement.className = 'card shadow-sm border-0 rounded-lg mb-3 problem-card';
+						problemElement.innerHTML = `
+							<div class="card-body">
+								<h5 class="card-title mb-3">
+									<a href="{{ url_for('math.problem', id='') }}${problem.id}" class="text-decoration-none text-primary stretched-link">
+										${problem.title}
+									</a>
+								</h5>
+								<div class="row align-items-center">
+									<div class="col-md-6">
+										<p class="mb-0">
+											<span class="badge bg-primary me-2">カテゴリ</span>
+											${problem.category}・${problem.unit}
+										</p>
+									</div>
+									<div class="col-md-6 text-md-end mt-2 mt-md-0">
+										<p class="mb-0">
+											<span class="badge bg-secondary me-2">投稿者</span>
+											${problem.user}
+										</p>
+									</div>
+								</div>
+							</div>
+						`;
+						problemElement.classList.add('newly-added');
+						container.appendChild(problemElement);
+					});
+					MathJax.typesetClear();
+					MathJax.typesetPromise([container]);
+				} else {
+					container.innerHTML = '<p>該当する問題がありません。</p>';
+				}
+			} catch (error) {
+				console.error("エラー:", error);
+			}
+		}
+	});
 </script>
 {% endblock %}

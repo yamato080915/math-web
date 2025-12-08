@@ -2,197 +2,197 @@
 {% block title %}問題編集{% endblock %}
 {% block content %}
 <div class="container my-5 form-container">
-    <div class="card shadow border-0 rounded-lg">
-        <div class="card-header bg-transparent">
-            <h1 class="card-title h3 text-primary my-3">問題編集</h1>
-        </div>
-        <div class="card-body">
-            <form method="post" id="editForm">
-                <div class="mb-4">
-                    <label for="title" class="form-label">タイトル</label>
-                    <input type="text" name="title" id="title" class="form-control" required value="{{ data['title'] }}">
-                </div><!--TITLE-->
-                
-                <div class="mb-4">
-                    <label for="preview" class="form-label">問題文プレビュー</label>
-                    <div class="preview-container">
-                        <div id="preview" class="border rounded bg-light p-4 math-font">{{ math_format(data['content']) | replace("\r\n", "<br>") | safe }}</div>
-                    </div>
-                </div><!--PREVIEW-->
-                
-                <div class="mb-4">
-                    <label for="content" class="form-label">問題文(LaTeX対応)</label>
-                    <textarea name="content" id="content" class="form-control" rows="6" required>{{ data['content'] }}</textarea>
-                </div><!--CONTENT-->
-                
-                <div class="mb-4">
-                    <label for="preview2" class="form-label">解答解説プレビュー</label>
-                    <div class="preview-container">
-                        <div id="preview2" class="border rounded bg-light p-4 math-font">{{ math_format(data['explanation']) | replace("\r\n", "<br>") | safe }}</div>
-                    </div>
-                </div><!--PREVIEW2-->
-                
-                <div class="mb-4">
-                    <label for="explanation" class="form-label">解答解説(任意)</label>
-                    <textarea name="explanation" id="explanation" class="form-control" rows="6">{{ data['explanation'] }}</textarea>
-                </div><!--EXPLANATION-->
-                
-                <div class="row">
-                    <div class="col-md-6 mb-4">
-                        <label for="category" class="form-label">カテゴリ</label>
-                        <select name="category" id="category" class="form-select" required>
-                            <option>数学Ⅰ</option>
-                            <option>数学Ａ</option>
-                            <option>数学Ⅱ</option>
-                            <option>数学Ｂ</option>
-                            <option>数学Ⅲ</option>
-                            <option>数学Ｃ</option>
-                        </select>
-                    </div><!--CATEGORY-->
-                    
-                    <div class="col-md-6 mb-4">
-                        <label for="unit" class="form-label">単元</label>
-                        <select name="unit" id="unit" class="form-select" required>
-                        </select>
-                    </div><!--UNIT-->
-                </div>
-                
-                <div class="d-grid mt-4">
-                    <button type="submit" class="btn btn-primary btn-lg">更新する</button>
-                </div>
-            </form>
-        </div>
-    </div>
+	<div class="card shadow border-0 rounded-lg">
+		<div class="card-header bg-transparent">
+			<h1 class="card-title h3 text-primary my-3">問題編集</h1>
+		</div>
+		<div class="card-body">
+			<form method="post" id="editForm">
+				<div class="mb-4">
+					<label for="title" class="form-label">タイトル</label>
+					<input type="text" name="title" id="title" class="form-control" required value="{{ data['title'] }}">
+				</div><!--TITLE-->
+				
+				<div class="mb-4">
+					<label for="preview" class="form-label">問題文プレビュー</label>
+					<div class="preview-container">
+						<div id="preview" class="border rounded bg-light p-4 math-font">{{ math_format(data['content']) | replace("\r\n", "<br>") | safe }}</div>
+					</div>
+				</div><!--PREVIEW-->
+				
+				<div class="mb-4">
+					<label for="content" class="form-label">問題文(LaTeX対応)</label>
+					<textarea name="content" id="content" class="form-control" rows="6" required>{{ data['content'] }}</textarea>
+				</div><!--CONTENT-->
+				
+				<div class="mb-4">
+					<label for="preview2" class="form-label">解答解説プレビュー</label>
+					<div class="preview-container">
+						<div id="preview2" class="border rounded bg-light p-4 math-font">{{ math_format(data['explanation']) | replace("\r\n", "<br>") | safe }}</div>
+					</div>
+				</div><!--PREVIEW2-->
+				
+				<div class="mb-4">
+					<label for="explanation" class="form-label">解答解説(任意)</label>
+					<textarea name="explanation" id="explanation" class="form-control" rows="6">{{ data['explanation'] }}</textarea>
+				</div><!--EXPLANATION-->
+				
+				<div class="row">
+					<div class="col-md-6 mb-4">
+						<label for="category" class="form-label">カテゴリ</label>
+						<select name="category" id="category" class="form-select" required>
+							<option>数学Ⅰ</option>
+							<option>数学Ａ</option>
+							<option>数学Ⅱ</option>
+							<option>数学Ｂ</option>
+							<option>数学Ⅲ</option>
+							<option>数学Ｃ</option>
+						</select>
+					</div><!--CATEGORY-->
+					
+					<div class="col-md-6 mb-4">
+						<label for="unit" class="form-label">単元</label>
+						<select name="unit" id="unit" class="form-select" required>
+						</select>
+					</div><!--UNIT-->
+				</div>
+				
+				<div class="d-grid mt-4">
+					<button type="submit" class="btn btn-primary btn-lg">更新する</button>
+				</div>
+			</form>
+		</div>
+	</div>
 </div>
 
 <style>
-    .form-container {
-        padding: 30px !important;
-    }
-    
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    .card {
-        animation: fadeInUp 0.6s ease-out forwards;
-    }
-    
-    .preview-container {
-        max-width: 100%;
-        margin: 0 auto;
-    }
-    
-    .math-font {
-        min-height: 120px;
-        max-width: 100%;
-        margin: 0 auto;
-        background-color: #f8f9fa;
-        border: 1px solid rgba(0,0,0,0.1) !important;
-    }
-    
-    .form-control, .form-select {
-        padding: 0.75rem;
-        border-radius: 6px;
-        transition: all 0.3s ease;
-        border: 1px solid #dee2e6;
-    }
-    
-    .form-control:focus, .form-select:focus {
-        border-color: var(--accent-color);
-        box-shadow: 0 0 0 0.2rem rgba(108, 99, 255, 0.25);
-    }
-    
-    .btn-primary {
-        background-color: var(--accent-color);
-        border-color: var(--accent-color);
-        padding: 0.75rem 1.5rem;
-        font-weight: 500;
-        transition: all 0.3s ease;
-    }
-    
-    .btn-primary:hover {
-        background-color: #5651db;
-        border-color: #5651db;
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(108, 99, 255, 0.2);
-    }
-    
-    .card {
-        overflow: hidden;
-        border-radius: 10px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.08) !important;
-    }
-    
-    .card-header {
-        border-bottom: 1px solid rgba(0,0,0,0.05);
-    }
-    
-    .card-title {
-        color: var(--primary-color);
-    }
-    
-    .form-label {
-        font-weight: 500;
-        color: var(--primary-color);
-        margin-bottom: 0.5rem;
-    }
+	.form-container {
+		padding: 30px !important;
+	}
+	
+	@keyframes fadeInUp {
+		from {
+			opacity: 0;
+			transform: translateY(30px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+	
+	.card {
+		animation: fadeInUp 0.6s ease-out forwards;
+	}
+	
+	.preview-container {
+		max-width: 100%;
+		margin: 0 auto;
+	}
+	
+	.math-font {
+		min-height: 120px;
+		max-width: 100%;
+		margin: 0 auto;
+		background-color: #f8f9fa;
+		border: 1px solid rgba(0,0,0,0.1) !important;
+	}
+	
+	.form-control, .form-select {
+		padding: 0.75rem;
+		border-radius: 6px;
+		transition: all 0.3s ease;
+		border: 1px solid #dee2e6;
+	}
+	
+	.form-control:focus, .form-select:focus {
+		border-color: var(--accent-color);
+		box-shadow: 0 0 0 0.2rem rgba(108, 99, 255, 0.25);
+	}
+	
+	.btn-primary {
+		background-color: var(--accent-color);
+		border-color: var(--accent-color);
+		padding: 0.75rem 1.5rem;
+		font-weight: 500;
+		transition: all 0.3s ease;
+	}
+	
+	.btn-primary:hover {
+		background-color: #5651db;
+		border-color: #5651db;
+		transform: translateY(-2px);
+		box-shadow: 0 5px 15px rgba(108, 99, 255, 0.2);
+	}
+	
+	.card {
+		overflow: hidden;
+		border-radius: 10px;
+		box-shadow: 0 10px 30px rgba(0,0,0,0.08) !important;
+	}
+	
+	.card-header {
+		border-bottom: 1px solid rgba(0,0,0,0.05);
+	}
+	
+	.card-title {
+		color: var(--primary-color);
+	}
+	
+	.form-label {
+		font-weight: 500;
+		color: var(--primary-color);
+		margin-bottom: 0.5rem;
+	}
 </style>
 
 {% include "math/problems/event.js.html" %}
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // 既存のスクリプト機能
-        const content = document.getElementById("content");
-        const preview = document.getElementById("preview");
-        listener(content, preview);
+	document.addEventListener('DOMContentLoaded', () => {
+		// 既存のスクリプト機能
+		const content = document.getElementById("content");
+		const preview = document.getElementById("preview");
+		listener(content, preview);
 
-        const explanation = document.getElementById("explanation");
-        const preview2 = document.getElementById("preview2");
-        listener(explanation, preview2);
+		const explanation = document.getElementById("explanation");
+		const preview2 = document.getElementById("preview2");
+		listener(explanation, preview2);
 
-        const unitMap = {
-            "数学Ⅰ": ["数と式", "2次関数", "集合と命題", "図形と計量", "データの分析"],
-            "数学Ａ": ["場合の数", "確率", "図形の性質", "整数"],
-            "数学Ⅱ": ["式と計算", "高次方程式", "図形と方程式", "三角関数", "指数関数と対数関数", "微分法", "積分法"],
-            "数学Ｂ": ["数列", "確率分布と統計的な推測"],
-            "数学Ⅲ": ["極限", "微分法", "積分法"],
-            "数学Ｃ": ["平面ベクトル", "空間ベクトル", "複素数平面", "式と曲線"]
-        };
+		const unitMap = {
+			"数学Ⅰ": ["数と式", "2次関数", "集合と命題", "図形と計量", "データの分析"],
+			"数学Ａ": ["場合の数", "確率", "図形の性質", "整数"],
+			"数学Ⅱ": ["式と計算", "高次方程式", "図形と方程式", "三角関数", "指数関数と対数関数", "微分法", "積分法"],
+			"数学Ｂ": ["数列", "確率分布と統計的な推測"],
+			"数学Ⅲ": ["極限", "微分法", "積分法"],
+			"数学Ｃ": ["平面ベクトル", "空間ベクトル", "複素数平面", "式と曲線"]
+		};
 
-        const categorySelect = document.getElementById("category");
-        const unitSelect = document.getElementById("unit");
+		const categorySelect = document.getElementById("category");
+		const unitSelect = document.getElementById("unit");
 
-        categorySelect.addEventListener("change", () => {
-            const selectedCategory = categorySelect.value;
-            const units = unitMap[selectedCategory] || [];
+		categorySelect.addEventListener("change", () => {
+			const selectedCategory = categorySelect.value;
+			const units = unitMap[selectedCategory] || [];
 
-            unitSelect.innerHTML = '<option disabled selected value="">単元を選択してください</option>';
-            units.forEach(unit => {
-                const option = document.createElement("option");
-                option.value = unit;
-                option.textContent = unit;
-                unitSelect.appendChild(option);
-            });
-        });
-        
-        categorySelect.value = "{{ data['category'] }}";
-        const units = unitMap["{{ data['category'] }}"] || [];
-        units.forEach(unit => {
-                const option = document.createElement("option");
-                option.value = unit;
-                option.textContent = unit;
-                unitSelect.appendChild(option);
-        });
+			unitSelect.innerHTML = '<option disabled selected value="">単元を選択してください</option>';
+			units.forEach(unit => {
+				const option = document.createElement("option");
+				option.value = unit;
+				option.textContent = unit;
+				unitSelect.appendChild(option);
+			});
+		});
+		
+		categorySelect.value = "{{ data['category'] }}";
+		const units = unitMap["{{ data['category'] }}"] || [];
+		units.forEach(unit => {
+				const option = document.createElement("option");
+				option.value = unit;
+				option.textContent = unit;
+				unitSelect.appendChild(option);
+		});
 
-        unitSelect.value = "{{ data['unit'] }}";
-    });
+		unitSelect.value = "{{ data['unit'] }}";
+	});
 </script>
 {% endblock %}
