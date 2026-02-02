@@ -1,6 +1,18 @@
 <script>
 	function mathjaxupdate(element, text) {
-		const formatted = text.replace(/\n/g, "<br>").replace("[終]", '<p style="text-align: right; padding-right: 10%;">(終)</p>');
+		const formatte = text.replace(/\n/g, "<br>").replace("[終]", '<p style="text-align: right; padding-right: 10%;">(終)</p>');
+		c = 0;
+		formatted = "";
+		for (const i of formatte.split("$")) {
+			if (c == 0) {
+				formatted += i;
+			} else if (c % 2 == 1) {
+				formatted += "\\(" + i;
+			} else {
+				formatted += "\\)" + i;
+			}
+			c+=1;
+		}
 		element.innerHTML = `${formatted}`;
 		MathJax.typesetClear();
 		MathJax.typesetPromise([element]);
