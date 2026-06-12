@@ -56,8 +56,8 @@
 							<i class="bi bi-image"></i> 画像から問題文を生成
 						</button>
 					</div>
-					<textarea name="content" id="content" class="form-control" rows="6" required placeholder="\(\text{sample}\)
-2次方程式\(\ ax^2+bx+c=0\ (a\neq 0)\ \)の解は\[\ x=\frac{-b\pm\sqrt{b^2-4ac}}{2a} \ \]である。
+					<textarea name="content" id="content" class="form-control" rows="6" required placeholder="$\text{sample}$
+2次方程式$\ ax^2+bx+c=0\ (a\neq 0)\ $の解は\[\ x=\frac{-b\pm\sqrt{b^2-4ac}}{2a} \ \]である。
 \[
 \int_{-\infty}^{\infty} e^{-x^2} \, dx = \sqrt{\pi}
 \]">{% if data!="" %}{{data}}{% endif %}</textarea>
@@ -141,7 +141,7 @@
 			
 			<div class="mt-4 latex-section">
 				<h5 class="mb-3">LaTeXについて</h5>
-				<p>"\\("と"\\)"で囲むと文章中に、"\\["と"\\]"で囲むと別行立てで数式が表示されます。</p>
+				<p>"\\("と"\\)"、もしくは"$"で囲むと文章中に、"\\["と"\\]"で囲むと別行立てで数式が表示されます。</p>
 				<h6 class="mb-3">主なコマンド</h6>
 				<p>詳しくは<a href="https://easy-copy-mathjax.nakaken88.com/all/" class="text-decoration-none">こちら</a></p>
 				<div class="latex-table-container">
@@ -356,7 +356,7 @@
 		// サンプルテキストの初期表示
 		data = "{{ data | replace('\n', '\\n') |safe }}"
 		if (data == "") {
-			const latexCode = "\\(\\text{sample}\\)\n2次方程式\\(\\ ax^2+bx+c=0\\ (a\\neq 0)\\ \\)の解は\\[\\ x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a} \\ \\]である。\\[\\int_{-\\infty}^{\\infty} e^{-x^2} \\, dx = \\sqrt{\\pi}\\]";
+			const latexCode = "$\\text{sample}$\n2次方程式$\\ ax^2+bx+c=0\\ (a\\neq 0)\\ $の解は\\[\\ x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a} \\ \\]である。\\[\\int_{-\\infty}^{\\infty} e^{-x^2} \\, dx = \\sqrt{\\pi}\\]";
 			mathjaxupdate(preview, latexCode);
 		} else {
 			mathjaxupdate(preview, content.value);
