@@ -12,7 +12,13 @@ import os, threading
 from . import mathjax
 
 def math_format(text):
-	return text.replace("[終]", '<p style="text-align: right; padding-right: 10%;">(終)</p>')
+	counter = 0
+	t = list(text)
+	while "$" in t:
+		t[t.index("$")] = "\\(" if counter%2==0 else "\\)"
+		counter += 1
+	t = "".join(t)
+	return t.replace("[終]", '<p style="text-align: right; padding-right: 10%;">(終)</p>')
 
 app.jinja_env.globals["math_format"] = math_format
 
